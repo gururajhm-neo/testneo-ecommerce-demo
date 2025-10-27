@@ -129,26 +129,72 @@ def create_mock_data():
         products = db.query(Product).all()
         
         if users and products:
-            for i in range(10):
+            # Create more realistic orders
+            order_statuses = [OrderStatus.PENDING, OrderStatus.PROCESSING, OrderStatus.SHIPPED, 
+                            OrderStatus.DELIVERED, OrderStatus.COMPLETED, OrderStatus.CANCELLED]
+            
+            cities = ["New York", "Los Angeles", "Chicago", "Houston", "Phoenix", "Philadelphia", 
+                     "San Antonio", "San Diego", "Dallas", "San Jose"]
+            
+            states = ["NY", "CA", "IL", "TX", "AZ", "PA", "TX", "CA", "TX", "CA"]
+            
+            for i in range(25):  # Create 25 orders
                 user = random.choice(users)
+                
+                # Create order with proper dates
+                order_date = datetime.utcnow() - timedelta(days=random.randint(0, 90))
+                
                 order = Order(
                     user_id=user.id,
                     payment_method=random.choice(list(PaymentMethod)),
-                    shipping_address={"street": f"{random.randint(100, 999)} Main St", "city": "New York", "state": "NY", "postal_code": "10001", "country": "US"},
-                    billing_address={"street": f"{random.randint(100, 999)} Main St", "city": "New York", "state": "NY", "postal_code": "10001", "country": "US"}
+                    shipping_address={"street": f"{random.randint(100, 9999)} Main St", 
+                                     "city": random.choice(cities), 
+                                     "state": random.choice(states), 
+                                     "postal_code": f"{random.randint(10000, 99999)}", 
+                                     "country": "US"},
+                    billing_address={"street": f"{random.randint(100, 9999)} Main St", 
+                                     "city": random.choice(cities), 
+                                     "state": random.choice(states), 
+                                     "postal_code": f"{random.randint(10000, 99999)}", 
+                                     "country": "US"}
                 )
-                order.status = random.choice(list(OrderStatus))
+                
+                # Set timestamps
+                order.created_at = order_date
+                order.updated_at = order_date
+                
+                # Random order status (weighted towards completed/delivered)
+                if i < 15:
+                    order.status = random.choice([OrderStatus.DELIVERED, OrderStatus.COMPLETED, OrderStatus.SHIPPED])
+                elif i < 20:
+                    order.status = random.choice([OrderStatus.PROCESSING, OrderStatus.PENDING])
+                else:
+                    order.status = random.choice([OrderStatus.CANCELLED, OrderStatus.REFUNDED])
+                
                 order.shipping_method = random.choice(list(ShippingMethod))
-                order.total_amount = random.randint(50, 1500)
-                order.subtotal = order.total_amount * 0.9
-                order.tax_amount = order.total_amount * 0.1
+                
+                # Add random number of items to calculate realistic totals
+                num_items = random.randint(1, 4)
+                selected_products = random.sample(products, min(num_items, len(products)))
+                
+                subtotal = 0
+                for product in selected_products:
+                    quantity = random.randint(1, 3)
+                    subtotal += (product.price * quantity)
+                
+                # Add shipping and tax
+                shipping_cost = 5.0 if subtotal < 50 else 0.0
+                tax_rate = 0.10
+                tax_amount = subtotal * tax_rate
+                order.total_amount = subtotal + shipping_cost + tax_amount
+                order.subtotal = subtotal
+                order.shipping_cost = shipping_cost
+                order.tax_amount = tax_amount
                 
                 db.add(order)
                 db.flush()
                 
                 # Add order items
-                num_items = random.randint(1, 3)
-                selected_products = random.sample(products, min(num_items, len(products)))
                 for product in selected_products:
                     quantity = random.randint(1, 3)
                     order_item = OrderItem(
@@ -163,7 +209,7 @@ def create_mock_data():
                 
                 db.commit()
             
-            print("[OK] Created 10 orders")
+            print(f"[OK] Created 25 orders")
         
         print("\n[4/5] Creating Reviews...")
         # Create reviews

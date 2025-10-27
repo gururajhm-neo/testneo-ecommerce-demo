@@ -131,7 +131,7 @@ def create_mock_data():
         if users and products:
             # Create more realistic orders
             order_statuses = [OrderStatus.PENDING, OrderStatus.PROCESSING, OrderStatus.SHIPPED, 
-                            OrderStatus.DELIVERED, OrderStatus.COMPLETED, OrderStatus.CANCELLED]
+                            OrderStatus.DELIVERED, OrderStatus.CONFIRMED, OrderStatus.CANCELLED]
             
             cities = ["New York", "Los Angeles", "Chicago", "Houston", "Phoenix", "Philadelphia", 
                      "San Antonio", "San Diego", "Dallas", "San Jose"]
@@ -163,11 +163,11 @@ def create_mock_data():
                 order.created_at = order_date
                 order.updated_at = order_date
                 
-                # Random order status (weighted towards completed/delivered)
+                # Random order status (weighted towards delivered/completed)
                 if i < 15:
-                    order.status = random.choice([OrderStatus.DELIVERED, OrderStatus.COMPLETED, OrderStatus.SHIPPED])
+                    order.status = random.choice([OrderStatus.DELIVERED, OrderStatus.CONFIRMED, OrderStatus.SHIPPED, OrderStatus.OUT_FOR_DELIVERY])
                 elif i < 20:
-                    order.status = random.choice([OrderStatus.PROCESSING, OrderStatus.PENDING])
+                    order.status = random.choice([OrderStatus.PROCESSING, OrderStatus.PENDING, OrderStatus.CONFIRMED])
                 else:
                     order.status = random.choice([OrderStatus.CANCELLED, OrderStatus.REFUNDED])
                 

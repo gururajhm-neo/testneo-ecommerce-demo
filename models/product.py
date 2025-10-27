@@ -198,6 +198,13 @@ class Product(Base):
     
     def to_dict(self) -> dict:
         """Convert product to dictionary"""
+        # Handle category - could be enum or string
+        category_value = self.category
+        if hasattr(self.category, 'value'):
+            category_value = self.category.value
+        elif isinstance(self.category, str):
+            category_value = self.category
+            
         return {
             "id": self.id,
             "name": self.name,
@@ -209,7 +216,7 @@ class Product(Base):
             "discount_percentage": self.discount_percentage,
             "sku": self.sku,
             "barcode": self.barcode,
-            "category": self.category.value,
+            "category": category_value,
             "subcategory": self.subcategory,
             "brand": self.brand,
             "manufacturer": self.manufacturer,

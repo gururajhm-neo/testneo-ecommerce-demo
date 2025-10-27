@@ -21,6 +21,9 @@ from config import settings
 # Import schemas
 from schemas import *
 
+# Import enums from models
+from models.order import PaymentMethod, PaymentStatus, ShippingMethod, OrderStatus
+
 # Import services
 from services.auth_service import *
 
@@ -703,18 +706,34 @@ async def get_cart(
     """Get user's cart"""
     cart_items = db.query(CartItem).filter(CartItem.user_id == current_user.id).all()
     
+    # Convert cart items to response format with product details
+    cart_items_data = []
     total_amount = 0
+    
     for item in cart_items:
         product = db.query(Product).filter(Product.id == item.product_id).first()
         if product:
             price = product.sale_price if product.sale_price else product.price
             total_amount += price * item.quantity
+            
+            # Create cart item with product dict
+            item_data = {
+                "id": item.id,
+                "user_id": item.user_id,
+                "product_id": item.product_id,
+                "quantity": item.quantity,
+                "selected_options": item.selected_options,
+                "added_at": item.added_at,
+                "updated_at": item.updated_at,
+                "product": product.to_dict() if hasattr(product, 'to_dict') else None
+            }
+            cart_items_data.append(item_data)
     
     return CartResponse(
-        items=cart_items,
-        total_items=len(cart_items),
+        items=cart_items_data,
+        total_items=len(cart_items_data),
         total_amount=total_amount,
-        item_count=len(cart_items)
+        item_count=len(cart_items_data)
     )
 
 @app.post("/cart", response_model=CartItemResponse, status_code=201)
@@ -745,7 +764,19 @@ async def add_to_cart(
         existing_item.selected_options = cart_item.selected_options
         db.commit()
         db.refresh(existing_item)
-        return existing_item
+        
+        # Create response with product info
+        result = CartItemResponse(
+            id=existing_item.id,
+            user_id=existing_item.user_id,
+            product_id=existing_item.product_id,
+            quantity=existing_item.quantity,
+            selected_options=existing_item.selected_options,
+            added_at=existing_item.added_at,
+            updated_at=existing_item.updated_at,
+            product=product.to_dict() if hasattr(product, 'to_dict') else None
+        )
+        return result
     else:
         # Create new cart item
         db_cart_item = CartItem(
@@ -757,7 +788,19 @@ async def add_to_cart(
         db.add(db_cart_item)
         db.commit()
         db.refresh(db_cart_item)
-        return db_cart_item
+        
+        # Create response with product info
+        result = CartItemResponse(
+            id=db_cart_item.id,
+            user_id=db_cart_item.user_id,
+            product_id=db_cart_item.product_id,
+            quantity=db_cart_item.quantity,
+            selected_options=db_cart_item.selected_options,
+            added_at=db_cart_item.added_at,
+            updated_at=db_cart_item.updated_at,
+            product=product.to_dict() if hasattr(product, 'to_dict') else None
+        )
+        return result
 
 @app.put("/cart/{item_id}", response_model=CartItemResponse)
 async def update_cart_item(
@@ -896,23 +939,26 @@ async def create_order(
     if total_amount > settings.max_order_amount:
         raise HTTPException(status_code=400, detail=f"Order maximum is ${settings.max_order_amount}")
     
-    # Create order
-    order_number = f"ORD-{datetime.utcnow().strftime('%Y%m%d')}-{secrets.token_hex(4).upper()}"
+    # Convert string enums to enum instances
+    payment_method_enum = PaymentMethod[order_data.payment_method.upper().replace('-', '_')]
+    shipping_method_enum = ShippingMethod[order_data.shipping_method.upper().replace('-', '_')]
     
+    # Create order
     db_order = Order(
-        order_number=order_number,
         user_id=current_user.id,
-        total_amount=total_amount,
-        subtotal=subtotal,
-        tax_amount=tax_amount,
-        shipping_amount=shipping_amount,
-        discount_amount=discount_amount,
-        payment_method=order_data.payment_method,
-        shipping_method=order_data.shipping_method,
+        payment_method=payment_method_enum,
         shipping_address=order_data.shipping_address,
-        billing_address=order_data.billing_address or order_data.shipping_address,
-        customer_notes=order_data.customer_notes
+        billing_address=order_data.billing_address or order_data.shipping_address
     )
+    
+    # Set additional order details
+    db_order.subtotal = subtotal
+    db_order.tax_amount = tax_amount
+    db_order.shipping_amount = shipping_amount
+    db_order.discount_amount = discount_amount
+    db_order.total_amount = total_amount
+    db_order.shipping_method = shipping_method_enum
+    db_order.customer_notes = order_data.customer_notes
     
     db.add(db_order)
     db.commit()
@@ -922,8 +968,17 @@ async def create_order(
     for item_data in order_items:
         db_order_item = OrderItem(
             order_id=db_order.id,
-            **item_data
+            product_id=item_data["product_id"],
+            quantity=item_data["quantity"],
+            unit_price=item_data["unit_price"]
         )
+        
+        # Set additional fields
+        db_order_item.product_name = item_data["product_name"]
+        db_order_item.product_sku = item_data["product_sku"]
+        db_order_item.product_image = item_data.get("product_image")
+        db_order_item.selected_options = item_data.get("selected_options")
+        
         db.add(db_order_item)
         
         # Update product stock
@@ -2424,6 +2479,22 @@ async def approve_review(
     
     return {"message": "Review approved successfully"}
 
+@app.put("/admin/reviews/{review_id}/reject")
+async def reject_review(
+    review_id: int,
+    current_user: User = Depends(get_current_moderator_user),
+    db: Session = Depends(get_db)
+):
+    """Reject review (moderator/admin only)"""
+    review = db.query(Review).filter(Review.id == review_id).first()
+    if not review:
+        raise HTTPException(status_code=404, detail="Review not found")
+    
+    review.is_approved = False
+    db.commit()
+    
+    return {"message": "Review rejected successfully"}
+
 @app.get("/admin/stats")
 async def admin_stats(
     current_user: User = Depends(get_current_admin_user),
@@ -2452,14 +2523,15 @@ async def admin_stats(
     cancelled_orders = db.query(Order).filter(Order.status == OrderStatus.CANCELLED).count()
     
     # Revenue statistics
-    total_revenue = db.query(Order).filter(Order.status == OrderStatus.DELIVERED).with_entities(
-        db.func.sum(Order.total_amount)
+    from sqlalchemy import func
+    total_revenue = db.query(func.sum(Order.total_amount)).filter(
+        Order.status == OrderStatus.DELIVERED
     ).scalar() or 0
     
-    today_revenue = db.query(Order).filter(
+    today_revenue = db.query(func.sum(Order.total_amount)).filter(
         Order.status == OrderStatus.DELIVERED,
         Order.delivered_at >= datetime.utcnow().date()
-    ).with_entities(db.func.sum(Order.total_amount)).scalar() or 0
+    ).scalar() or 0
     
     # Review statistics
     total_reviews = db.query(Review).count()

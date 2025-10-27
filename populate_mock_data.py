@@ -246,7 +246,6 @@ def create_mock_data():
         
         print("\n[5/5] Creating Coupons...")
         # Create coupons
-        from datetime import datetime, timedelta
         coupons_data = [
             {"code": "SAVE10", "name": "Save 10%", "discount_type": "percentage", "discount_value": 10, "valid_from": datetime.utcnow(), "valid_until": datetime.utcnow() + timedelta(days=30), "minimum_order_amount": 50},
             {"code": "SAVE20", "name": "Save 20%", "discount_type": "percentage", "discount_value": 20, "valid_from": datetime.utcnow(), "valid_until": datetime.utcnow() + timedelta(days=30), "minimum_order_amount": 100},

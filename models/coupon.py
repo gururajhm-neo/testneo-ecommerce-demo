@@ -63,7 +63,7 @@ class Coupon(Base):
     )
     
     def __init__(self, code: str, name: str, discount_type: str, discount_value: float,
-                 valid_from: datetime, valid_until: datetime):
+                 valid_from: datetime, valid_until: datetime, **kwargs):
         """Initialize coupon"""
         self.code = code
         self.name = name
@@ -71,6 +71,11 @@ class Coupon(Base):
         self.discount_value = discount_value
         self.valid_from = valid_from
         self.valid_until = valid_until
+        
+        # Set additional attributes if provided
+        for key, value in kwargs.items():
+            if hasattr(self, key):
+                setattr(self, key, value)
     
     def is_valid(self, order_amount: float = 0, user_id: int = None, product_ids: list = None) -> tuple[bool, str]:
         """Check if coupon is valid for given conditions"""

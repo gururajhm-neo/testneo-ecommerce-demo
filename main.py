@@ -564,7 +564,33 @@ async def list_users(
     db: Session = Depends(get_db)
 ):
     """List all users (admin only)"""
-    users = db.query(User).offset(skip).limit(limit).all()
+    # Use raw SQL to avoid enum conversion issues
+    from sqlalchemy import text
+    query = text("""
+        SELECT id, email, username, first_name, last_name, phone, is_active, 
+               is_verified, role, created_at, updated_at
+        FROM users
+        LIMIT :limit OFFSET :skip
+    """)
+    result = db.execute(query, {"limit": limit, "skip": skip})
+    users = []
+    for row in result:
+        role = row.role.lower() if row.role else 'customer'  # Convert to lowercase for API
+        users.append({
+            'id': row.id,
+            'email': row.email,
+            'username': row.username,
+            'first_name': row.first_name,
+            'last_name': row.last_name,
+            'phone': row.phone,
+            'is_active': bool(row.is_active),
+            'is_verified': bool(row.is_verified),
+            'is_email_verified': False,  # Default value
+            'role': role,
+            'created_at': row.created_at,
+            'updated_at': row.updated_at,
+            'last_login': None,  # Default value
+        })
     return users
 
 @app.get("/users/{user_id}", response_model=UserResponse)
@@ -578,6 +604,51 @@ async def get_user(
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return user
+
+@app.put("/users/{user_id}", response_model=UserResponse)
+async def update_user(
+    user_id: int,
+    user_update: dict,
+    current_user: User = Depends(get_current_admin_user),
+    db: Session = Depends(get_db)
+):
+    """Update user by ID (admin only)"""
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Update user fields (exclude password_hash and other sensitive fields)
+    allowed_fields = ['email', 'username', 'first_name', 'last_name', 'phone', 'role', 'is_active', 'is_verified']
+    
+    for field, value in user_update.items():
+        if field in allowed_fields and hasattr(user, field):
+            # Convert role to uppercase if it's a role field
+            if field == 'role' and isinstance(value, str):
+                value = value.upper()
+            setattr(user, field, value)
+    
+    user.updated_at = datetime.utcnow()
+    db.commit()
+    db.refresh(user)
+    return user.to_dict()
+
+@app.delete("/users/{user_id}")
+async def delete_user(
+    user_id: int,
+    current_user: User = Depends(get_current_admin_user),
+    db: Session = Depends(get_db)
+):
+    """Delete user (admin only)"""
+    if user_id == current_user.id:
+        raise HTTPException(status_code=400, detail="Cannot delete your own account")
+    
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    db.delete(user)
+    db.commit()
+    return {"message": "User deleted successfully"}
 
 # ============================================================================
 # PRODUCT ENDPOINTS
@@ -1031,7 +1102,7 @@ async def get_order(
 @app.put("/orders/{order_id}", response_model=OrderResponse)
 async def update_order(
     order_id: int,
-    order_update: OrderUpdate,
+    order_update: dict,
     current_user: User = Depends(get_current_admin_user),
     db: Session = Depends(get_db)
 ):
@@ -1040,12 +1111,43 @@ async def update_order(
     if not order:
         raise HTTPException(status_code=404, detail="Order not found")
     
-    for field, value in order_update.dict(exclude_unset=True).items():
-        setattr(order, field, value)
+    # Handle status update - convert string to enum if needed
+    if 'status' in order_update:
+        status_value = order_update['status']
+        if isinstance(status_value, str):
+            try:
+                order_update['status'] = OrderStatus[status_value]
+            except KeyError:
+                raise HTTPException(status_code=400, detail=f"Invalid status: {status_value}")
+    
+    for field, value in order_update.items():
+        if hasattr(order, field):
+            setattr(order, field, value)
     
     db.commit()
     db.refresh(order)
     return order
+
+@app.delete("/admin/orders/{order_id}")
+async def admin_cancel_order(
+    order_id: int,
+    current_user: User = Depends(get_current_admin_user),
+    db: Session = Depends(get_db)
+):
+    """Cancel order (admin only - can cancel any order)"""
+    order = db.query(Order).filter(Order.id == order_id).first()
+    
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+    
+    if order.status == OrderStatus.CANCELLED:
+        raise HTTPException(status_code=400, detail="Order is already cancelled")
+    
+    order.status = OrderStatus.CANCELLED
+    order.cancelled_at = datetime.utcnow()
+    
+    db.commit()
+    return {"message": "Order cancelled successfully"}
 
 @app.delete("/orders/{order_id}")
 async def cancel_order(
@@ -1175,6 +1277,22 @@ async def update_review(
     db.commit()
     db.refresh(review)
     return review
+
+@app.delete("/admin/reviews/{review_id}")
+async def admin_delete_review(
+    review_id: int,
+    current_user: User = Depends(get_current_moderator_user),
+    db: Session = Depends(get_db)
+):
+    """Delete review (admin/moderator only)"""
+    review = db.query(Review).filter(Review.id == review_id).first()
+    
+    if not review:
+        raise HTTPException(status_code=404, detail="Review not found")
+    
+    db.delete(review)
+    db.commit()
+    return {"message": "Review deleted successfully"}
 
 @app.delete("/reviews/{review_id}")
 async def delete_review(
@@ -2448,7 +2566,7 @@ async def admin_list_orders(
 @app.get("/admin/reviews", response_model=List[ReviewResponse])
 async def admin_list_reviews(
     skip: int = Query(0, ge=0),
-    limit: int = Query(20, ge=1, le=100),
+    limit: int = Query(100, ge=1, le=200),
     approved: Optional[bool] = Query(None),
     current_user: User = Depends(get_current_moderator_user),
     db: Session = Depends(get_db)
@@ -2460,7 +2578,19 @@ async def admin_list_reviews(
         query = query.filter(Review.is_approved == approved)
     
     reviews = query.order_by(Review.created_at.desc()).offset(skip).limit(limit).all()
-    return reviews
+    
+    # Add product information to each review
+    from models.product import Product
+    result = []
+    for review in reviews:
+        product = db.query(Product).filter(Product.id == review.product_id).first()
+        review_dict = review.to_dict()
+        if product:
+            review_dict['product'] = product.to_dict()
+            review_dict['product_name'] = product.name
+        result.append(review_dict)
+    
+    return result
 
 @app.put("/admin/reviews/{review_id}/approve")
 async def approve_review(

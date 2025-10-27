@@ -35,6 +35,8 @@ class ReviewResponse(BaseModel):
     updated_at: datetime
     approved_at: Optional[datetime]
     user: Optional[Dict[str, Any]] = None  # User details
+    product: Optional[Dict[str, Any]] = None  # Product details
+    product_name: Optional[str] = None  # Quick access to product name
     
     class Config:
         from_attributes = True

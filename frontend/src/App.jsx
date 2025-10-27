@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
+import { ToastProvider } from './components/Toast';
 import Layout from './components/Layout';
 import AdminLayout from './components/admin/AdminLayout';
 import Home from './pages/Home';
@@ -16,6 +17,7 @@ import AdminProducts from './pages/admin/Products';
 import AdminOrders from './pages/admin/Orders';
 import AdminUsers from './pages/admin/Users';
 import AdminReviews from './pages/admin/Reviews';
+import AdminCoupons from './pages/admin/Coupons';
 
 const PrivateRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
@@ -49,6 +51,7 @@ function App() {
   return (
     <AuthProvider>
       <CartProvider>
+        <ToastProvider>
         <Router>
           <Routes>
             {/* Customer Routes */}
@@ -61,18 +64,20 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             
-            {/* Admin Routes */}
-            <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
-            <Route path="/admin/products" element={<AdminRoute><AdminProducts /></AdminRoute>} />
-            <Route path="/admin/orders" element={<AdminRoute><AdminOrders /></AdminRoute>} />
-            <Route path="/admin/users" element={<AdminRoute><AdminUsers /></AdminRoute>} />
-            <Route path="/admin/reviews" element={<AdminRoute><AdminReviews /></AdminRoute>} />
+                   {/* Admin Routes */}
+                   <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+                   <Route path="/admin/products" element={<AdminRoute><AdminProducts /></AdminRoute>} />
+                   <Route path="/admin/orders" element={<AdminRoute><AdminOrders /></AdminRoute>} />
+                   <Route path="/admin/users" element={<AdminRoute><AdminUsers /></AdminRoute>} />
+                   <Route path="/admin/reviews" element={<AdminRoute><AdminReviews /></AdminRoute>} />
+                   <Route path="/admin/coupons" element={<AdminRoute><AdminCoupons /></AdminRoute>} />
             
             <Route path="*" element={<Navigate to="/" />} />
-          </Routes>
-        </Router>
-      </CartProvider>
-    </AuthProvider>
+        </Routes>
+      </Router>
+      </ToastProvider>
+    </CartProvider>
+  </AuthProvider>
   );
 }
 

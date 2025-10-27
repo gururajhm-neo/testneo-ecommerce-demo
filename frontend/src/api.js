@@ -100,7 +100,7 @@ export const adminOrdersAPI = {
   getAllOrders: (params = {}) => api.get('/orders', { params }),
   getOrder: (id) => api.get(`/orders/${id}`),
   updateOrder: (id, data) => api.put(`/orders/${id}`, data),
-  cancelOrder: (id) => api.delete(`/orders/${id}`),
+  cancelOrder: (id) => api.delete(`/admin/orders/${id}`),
 };
 
 // Admin - Users
@@ -108,6 +108,8 @@ export const adminUsersAPI = {
   getAllUsers: (params = {}) => api.get('/users', { params }),
   getUser: (id) => api.get(`/users/${id}`),
   updateUser: (id, data) => api.put(`/users/${id}`, data),
+  deleteUser: (id) => api.delete(`/users/${id}`),
+  createUser: (data) => api.post('/auth/register', data),
 };
 
 // Admin - Reviews
@@ -115,7 +117,7 @@ export const adminReviewsAPI = {
   getAllReviews: (params = {}) => api.get('/admin/reviews', { params }),
   approveReview: (id) => api.put(`/admin/reviews/${id}/approve`),
   rejectReview: (id) => api.put(`/admin/reviews/${id}/reject`),
-  deleteReview: (id) => api.delete(`/reviews/${id}`),
+  deleteReview: (id) => api.delete(`/admin/reviews/${id}`),
 };
 
 export default api;

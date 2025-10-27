@@ -1,0 +1,1519 @@
+{
+  "name": "E-Commerce Testing Platform - UI Design System",
+  "version": "1.0",
+  "pages": [
+    {
+      "name": "Authentication Pages",
+      "children": [
+        {
+          "name": "Login Page",
+          "type": "FRAME",
+          "backgroundColor": "#FFFFFF",
+          "layout": {
+            "x": 0,
+            "y": 0,
+            "width": 1440,
+            "height": 1024
+          },
+          "components": [
+            {
+              "name": "Login Form",
+              "type": "COMPONENT",
+              "props": {
+                "title": "Welcome Back",
+                "subtitle": "Sign in to your account",
+                "emailField": "Email",
+                "passwordField": "Password",
+                "forgotPasswordLink": true,
+                "submitButton": "Sign In",
+                "registerLink": "Don't have an account? Register"
+              },
+              "children": [
+                {
+                  "name": "Email Input",
+                  "type": "INPUT",
+                  "placeholder": "Enter your email",
+                  "validation": "email"
+                },
+                {
+                  "name": "Password Input",
+                  "type": "INPUT",
+                  "placeholder": "Enter your password",
+                  "inputType": "password"
+                },
+                {
+                  "name": "Submit Button",
+                  "type": "BUTTON",
+                  "variant": "primary",
+                  "label": "Sign In"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Register Page",
+          "type": "FRAME",
+          "backgroundColor": "#FFFFFF",
+          "components": [
+            {
+              "name": "Registration Form",
+              "type": "COMPONENT",
+              "props": {
+                "title": "Create Account",
+                "subtitle": "Sign up to get started",
+                "emailField": "Email",
+                "usernameField": "Username",
+                "passwordField": "Password",
+                "confirmPasswordField": "Confirm Password",
+                "agreeToTerms": true,
+                "submitButton": "Register",
+                "loginLink": "Already have an account? Sign in"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Customer Pages",
+      "children": [
+        {
+          "name": "Home Page",
+          "type": "FRAME",
+          "backgroundColor": "#F8F9FA",
+          "layout": {
+            "width": 1440,
+            "height": 1024
+          },
+          "components": [
+            {
+              "name": "Navigation Bar",
+              "type": "COMPONENT",
+              "layout": "sticky",
+              "children": [
+                {
+                  "name": "Logo",
+                  "type": "TEXT",
+                  "content": "E-Commerce",
+                  "fontSize": 24,
+                  "fontWeight": "bold"
+                },
+                {
+                  "name": "Search Bar",
+                  "type": "INPUT",
+                  "placeholder": "Search products...",
+                  "icon": "search"
+                },
+                {
+                  "name": "Cart Button",
+                  "type": "BUTTON",
+                  "icon": "shopping-cart",
+                  "badge": "cartCount"
+                },
+                {
+                  "name": "User Menu",
+                  "type": "DROPDOWN",
+                  "options": ["Profile", "Orders", "Logout"]
+                }
+              ]
+            },
+            {
+              "name": "Hero Section",
+              "type": "COMPONENT",
+              "layout": "full-width",
+              "backgroundImage": "hero-banner",
+              "children": [
+                {
+                  "name": "Hero Title",
+                  "type": "TEXT",
+                  "content": "Shop the Latest Trends",
+                  "fontSize": 48
+                },
+                {
+                  "name": "Hero Subtitle",
+                  "type": "TEXT",
+                  "content": "Discover amazing products at unbeatable prices",
+                  "fontSize": 24
+                },
+                {
+                  "name": "Shop Now Button",
+                  "type": "BUTTON",
+                  "label": "Shop Now",
+                  "variant": "primary"
+                }
+              ]
+            },
+            {
+              "name": "Featured Categories",
+              "type": "COMPONENT",
+              "layout": "grid",
+              "gridColumns": 4,
+              "children": [
+                {
+                  "name": "Category Card - Electronics",
+                  "type": "COMPONENT",
+                  "props": {
+                    "image": "electronics.jpg",
+                    "title": "Electronics",
+                    "productCount": 120
+                  }
+                },
+                {
+                  "name": "Category Card - Clothing",
+                  "type": "COMPONENT",
+                  "props": {
+                    "image": "clothing.jpg",
+                    "title": "Clothing",
+                    "productCount": 85
+                  }
+                },
+                {
+                  "name": "Category Card - Books",
+                  "type": "COMPONENT",
+                  "props": {
+                    "image": "books.jpg",
+                    "title": "Books",
+                    "productCount": 200
+                  }
+                },
+                {
+                  "name": "Category Card - Home & Garden",
+                  "type": "COMPONENT",
+                  "props": {
+                    "image": "home-garden.jpg",
+                    "title": "Home & Garden",
+                    "productCount": 95
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Featured Products",
+              "type": "COMPONENT",
+              "title": "Featured Products",
+              "layout": "grid",
+              "gridColumns": 4,
+              "children": [
+                {
+                  "name": "Product Card",
+                  "type": "COMPONENT",
+                  "props": {
+                    "image": "product-image",
+                    "name": "Product Name",
+                    "price": "$99.99",
+                    "salePrice": "$79.99",
+                    "rating": 4.5,
+                    "reviewCount": 128,
+                    "stockBadge": "In Stock"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Product Listing Page",
+          "type": "FRAME",
+          "components": [
+            {
+              "name": "Filters Sidebar",
+              "type": "COMPONENT",
+              "layout": "sidebar",
+              "children": [
+                {
+                  "name": "Category Filter",
+                  "type": "COMPONENT",
+                  "title": "Category",
+                  "options": ["Electronics", "Clothing", "Books", "Home & Garden"]
+                },
+                {
+                  "name": "Price Range Filter",
+                  "type": "COMPONENT",
+                  "title": "Price Range",
+                  "min": 0,
+                  "max": 5000,
+                  "step": 10
+                },
+                {
+                  "name": "Brand Filter",
+                  "type": "COMPONENT",
+                  "title": "Brand",
+                  "options": ["Apple", "Samsung", "Nike", "Adidas"]
+                },
+                {
+                  "name": "Rating Filter",
+                  "type": "COMPONENT",
+                  "title": "Minimum Rating",
+                  "options": ["4+ Stars", "3+ Stars", "2+ Stars"]
+                }
+              ]
+            },
+            {
+              "name": "Product List",
+              "type": "COMPONENT",
+              "layout": "grid",
+              "gridColumns": 3,
+              "children": [
+                {
+                  "name": "Product Card",
+                  "type": "COMPONENT",
+                  "description": "Reusable product card component"
+                }
+              ],
+              "pagination": true
+            },
+            {
+              "name": "Sort Options",
+              "type": "COMPONENT",
+              "layout": "horizontal",
+              "options": [
+                "Price: Low to High",
+                "Price: High to Low",
+                "Newest First",
+                "Rating",
+                "Popular"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Product Details Page",
+          "type": "FRAME",
+          "components": [
+            {
+              "name": "Product Gallery",
+              "type": "COMPONENT",
+              "layout": "carousel",
+              "children": [
+                {
+                  "name": "Main Image",
+                  "type": "IMAGE",
+                  "width": 600,
+                  "height": 600
+                },
+                {
+                  "name": "Thumbnail Strip",
+                  "type": "COMPONENT",
+                  "layout": "horizontal",
+                  "children": [
+                    {
+                      "name": "Thumbnail",
+                      "type": "IMAGE",
+                      "width": 80,
+                      "height": 80
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Product Info",
+              "type": "COMPONENT",
+              "children": [
+                {
+                  "name": "Product Title",
+                  "type": "TEXT",
+                  "fontSize": 32,
+                  "fontWeight": "bold"
+                },
+                {
+                  "name": "Product Price",
+                  "type": "COMPONENT",
+                  "props": {
+                    "price": 299.99,
+                    "salePrice": 249.99,
+                    "discountPercentage": 17
+                  }
+                },
+                {
+                  "name": "Stock Status",
+                  "type": "BADGE",
+                  "variant": "success",
+                  "text": "In Stock"
+                },
+                {
+                  "name": "Rating Display",
+                  "type": "COMPONENT",
+                  "props": {
+                    "rating": 4.5,
+                    "reviewCount": 234,
+                    "showStars": true
+                  }
+                },
+                {
+                  "name": "Quantity Selector",
+                  "type": "COMPONENT",
+                  "props": {
+                    "min": 1,
+                    "max": 10,
+                    "value": 1
+                  }
+                },
+                {
+                  "name": "Add to Cart Button",
+                  "type": "BUTTON",
+                  "variant": "primary",
+                  "label": "Add to Cart",
+                  "icon": "shopping-cart"
+                },
+                {
+                  "name": "Wishlist Button",
+                  "type": "BUTTON",
+                  "variant": "outline",
+                  "icon": "heart"
+                }
+              ]
+            },
+            {
+              "name": "Product Description",
+              "type": "COMPONENT",
+              "title": "Description",
+              "content": "Full product description with features and specifications..."
+            },
+            {
+              "name": "Product Specifications",
+              "type": "COMPONENT",
+              "layout": "table",
+              "rows": [
+                {"label": "Brand", "value": "Apple"},
+                {"label": "Model", "value": "iPhone 15 Pro"},
+                {"label": "Color", "value": "Titanium Blue"},
+                {"label": "Storage", "value": "256GB"}
+              ]
+            },
+            {
+              "name": "Customer Reviews",
+              "type": "COMPONENT",
+              "children": [
+                {
+                  "name": "Review Summary",
+                  "type": "COMPONENT",
+                  "props": {
+                    "averageRating": 4.5,
+                    "totalReviews": 234,
+                    "ratingDistribution": {
+                      "5": 150,
+                      "4": 50,
+                      "3": 20,
+                      "2": 10,
+                      "1": 4
+                    }
+                  }
+                },
+                {
+                  "name": "Review List",
+                  "type": "COMPONENT",
+                  "children": [
+                    {
+                      "name": "Review Card",
+                      "type": "COMPONENT",
+                      "props": {
+                        "userName": "John Doe",
+                        "rating": 5,
+                        "date": "2024-01-15",
+                        "reviewText": "Great product!",
+                        "verifiedPurchase": true,
+                        "helpful": 12
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Shopping Cart Page",
+          "type": "FRAME",
+          "components": [
+            {
+              "name": "Cart Items List",
+              "type": "COMPONENT",
+              "children": [
+                {
+                  "name": "Cart Item",
+                  "type": "COMPONENT",
+                  "layout": "horizontal",
+                  "children": [
+                    {
+                      "name": "Product Image",
+                      "type": "IMAGE",
+                      "width": 120,
+                      "height": 120
+                    },
+                    {
+                      "name": "Product Info",
+                      "type": "COMPONENT",
+                      "props": {
+                        "name": "Product Name",
+                        "sku": "SKU-12345",
+                        "price": 99.99
+                      }
+                    },
+                    {
+                      "name": "Quantity Selector",
+                      "type": "COMPONENT"
+                    },
+                    {
+                      "name": "Item Subtotal",
+                      "type": "TEXT",
+                      "content": "$299.97"
+                    },
+                    {
+                      "name": "Remove Button",
+                      "type": "BUTTON",
+                      "icon": "trash",
+                      "variant": "danger"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Order Summary",
+              "type": "COMPONENT",
+              "layout": "sidebar",
+              "children": [
+                {
+                  "name": "Subtotal",
+                  "type": "COMPONENT",
+                  "label": "Subtotal",
+                  "value": "$299.97"
+                },
+                {
+                  "name": "Shipping",
+                  "type": "COMPONENT",
+                  "label": "Shipping",
+                  "value": "$5.00"
+                },
+                {
+                  "name": "Tax",
+                  "type": "COMPONENT",
+                  "label": "Tax",
+                  "value": "$30.00"
+                },
+                {
+                  "name": "Coupon Input",
+                  "type": "COMPONENT",
+                  "placeholder": "Enter coupon code",
+                  "button": "Apply"
+                },
+                {
+                  "name": "Discount",
+                  "type": "COMPONENT",
+                  "label": "Discount",
+                  "value": "-$50.00",
+                  "color": "green"
+                },
+                {
+                  "name": "Total",
+                  "type": "COMPONENT",
+                  "label": "Total",
+                  "value": "$284.97",
+                  "fontSize": 24,
+                  "fontWeight": "bold"
+                },
+                {
+                  "name": "Checkout Button",
+                  "type": "BUTTON",
+                  "variant": "primary",
+                  "label": "Proceed to Checkout",
+                  "size": "large"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Checkout Page",
+          "type": "FRAME",
+          "components": [
+            {
+              "name": "Shipping Address",
+              "type": "COMPONENT",
+              "title": "Shipping Address",
+              "fields": [
+                {
+                  "name": "Full Name",
+                  "type": "INPUT",
+                  "placeholder": "John Doe"
+                },
+                {
+                  "name": "Address",
+                  "type": "INPUT",
+                  "placeholder": "123 Main St"
+                },
+                {
+                  "name": "City",
+                  "type": "INPUT",
+                  "placeholder": "New York"
+                },
+                {
+                  "name": "State",
+                  "type": "SELECT",
+                  "options": ["NY", "CA", "TX", "FL"]
+                },
+                {
+                  "name": "Postal Code",
+                  "type": "INPUT",
+                  "placeholder": "10001"
+                },
+                {
+                  "name": "Country",
+                  "type": "INPUT",
+                  "value": "United States"
+                }
+              ]
+            },
+            {
+              "name": "Billing Address",
+              "type": "COMPONENT",
+              "title": "Billing Address",
+              "sameAsShipping": true,
+              "fields": [
+                "Full Name",
+                "Address",
+                "City",
+                "State",
+                "Postal Code",
+                "Country"
+              ]
+            },
+            {
+              "name": "Payment Method",
+              "type": "COMPONENT",
+              "title": "Payment Method",
+              "options": [
+                {
+                  "type": "credit_card",
+                  "name": "Credit Card",
+                  "icon": "credit-card"
+                },
+                {
+                  "type": "paypal",
+                  "name": "PayPal",
+                  "icon": "paypal"
+                },
+                {
+                  "type": "cash_on_delivery",
+                  "name": "Cash on Delivery",
+                  "icon": "cash"
+                }
+              ],
+              "selected": "credit_card"
+            },
+            {
+              "name": "Credit Card Form",
+              "type": "COMPONENT",
+              "fields": [
+                {
+                  "name": "Card Number",
+                  "type": "INPUT",
+                  "placeholder": "1234 5678 9012 3456",
+                  "mask": "#### #### #### ####"
+                },
+                {
+                  "name": "Cardholder Name",
+                  "type": "INPUT",
+                  "placeholder": "John Doe"
+                },
+                {
+                  "name": "Expiry Date",
+                  "type": "INPUT",
+                  "placeholder": "MM/YY",
+                  "mask": "##/##"
+                },
+                {
+                  "name": "CVV",
+                  "type": "INPUT",
+                  "placeholder": "123",
+                  "mask": "###"
+                }
+              ]
+            },
+            {
+              "name": "Order Review",
+              "type": "COMPONENT",
+              "title": "Order Summary",
+              "items": [
+                "Product 1 x 2 - $199.98",
+                "Product 2 x 1 - $99.99"
+              ],
+              "subtotal": 299.97,
+              "shipping": 5.00,
+              "tax": 30.50,
+              "discount": -50.00,
+              "total": 285.47
+            },
+            {
+              "name": "Place Order Button",
+              "type": "BUTTON",
+              "variant": "primary",
+              "label": "Place Order",
+              "size": "large"
+            }
+          ]
+        },
+        {
+          "name": "Order Confirmation Page",
+          "type": "FRAME",
+          "backgroundColor": "#F0FDF4",
+          "components": [
+            {
+              "name": "Success Icon",
+              "type": "COMPONENT",
+              "icon": "check-circle",
+              "size": 64,
+              "color": "#22C55E"
+            },
+            {
+              "name": "Success Message",
+              "type": "TEXT",
+              "content": "Order Placed Successfully!",
+              "fontSize": 32,
+              "fontWeight": "bold"
+            },
+            {
+              "name": "Order Number",
+              "type": "COMPONENT",
+              "label": "Order Number",
+              "value": "ORD-20240115-ABC123",
+              "copyButton": true
+            },
+            {
+              "name": "Estimated Delivery",
+              "type": "COMPONENT",
+              "label": "Estimated Delivery",
+              "value": "January 22, 2024"
+            },
+            {
+              "name": "Order Summary",
+              "type": "COMPONENT",
+              "props": {
+                "items": 3,
+                "total": 285.47
+              }
+            },
+            {
+              "name": "Continue Shopping Button",
+              "type": "BUTTON",
+              "variant": "primary",
+              "label": "Continue Shopping"
+            },
+            {
+              "name": "View Order Button",
+              "type": "BUTTON",
+              "variant": "outline",
+              "label": "View Order Details"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Admin Pages",
+      "children": [
+        {
+          "name": "Admin Dashboard",
+          "type": "FRAME",
+          "components": [
+            {
+              "name": "Admin Sidebar",
+              "type": "COMPONENT",
+              "layout": "fixed",
+              "background": "#1F2937",
+              "children": [
+                {
+                  "name": "Logo",
+                  "type": "TEXT",
+                  "content": "Admin Panel",
+                  "color": "#FFFFFF"
+                },
+                {
+                  "name": "Navigation Links",
+                  "type": "COMPONENT",
+                  "items": [
+                    {
+                      "name": "Dashboard",
+                      "icon": "layout",
+                      "active": true
+                    },
+                    {
+                      "name": "Products",
+                      "icon": "package"
+                    },
+                    {
+                      "name": "Orders",
+                      "icon": "shopping-bag"
+                    },
+                    {
+                      "name": "Users",
+                      "icon": "users"
+                    },
+                    {
+                      "name": "Reviews",
+                      "icon": "star"
+                    },
+                    {
+                      "name": "Coupons",
+                      "icon": "tag"
+                    },
+                    {
+                      "name": "Settings",
+                      "icon": "settings"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Admin Header",
+              "type": "COMPONENT",
+              "layout": "horizontal",
+              "background": "#FFFFFF",
+              "children": [
+                {
+                  "name": "Page Title",
+                  "type": "TEXT",
+                  "content": "Dashboard",
+                  "fontSize": 24
+                },
+                {
+                  "name": "Search Bar",
+                  "type": "INPUT",
+                  "placeholder": "Search..."
+                },
+                {
+                  "name": "Notifications",
+                  "type": "BUTTON",
+                  "icon": "bell",
+                  "badge": 5
+                },
+                {
+                  "name": "User Menu",
+                  "type": "DROPDOWN",
+                  "profilePicture": "avatar.jpg",
+                  "options": ["Profile", "Settings", "Logout"]
+                }
+              ]
+            },
+            {
+              "name": "Statistics Cards",
+              "type": "COMPONENT",
+              "layout": "grid",
+              "gridColumns": 4,
+              "children": [
+                {
+                  "name": "Revenue Card",
+                  "type": "COMPONENT",
+                  "title": "Total Revenue",
+                  "value": "$45,230",
+                  "change": "+12.5%",
+                  "icon": "dollar-sign",
+                  "color": "green"
+                },
+                {
+                  "name": "Orders Card",
+                  "type": "COMPONENT",
+                  "title": "Total Orders",
+                  "value": "1,234",
+                  "change": "+8.2%",
+                  "icon": "shopping-bag",
+                  "color": "blue"
+                },
+                {
+                  "name": "Users Card",
+                  "type": "COMPONENT",
+                  "title": "Total Users",
+                  "value": "8,567",
+                  "change": "+15.3%",
+                  "icon": "users",
+                  "color": "purple"
+                },
+                {
+                  "name": "Products Card",
+                  "type": "COMPONENT",
+                  "title": "Total Products",
+                  "value": "234",
+                  "change": "+5.7%",
+                  "icon": "package",
+                  "color": "orange"
+                }
+              ]
+            },
+            {
+              "name": "Sales Chart",
+              "type": "COMPONENT",
+              "title": "Sales Overview",
+              "chartType": "line",
+              "dataPoints": [
+                {"date": "Jan", "sales": 45000},
+                {"date": "Feb", "sales": 52000},
+                {"date": "Mar", "sales": 48000}
+              ]
+            },
+            {
+              "name": "Recent Orders Table",
+              "type": "COMPONENT",
+              "title": "Recent Orders",
+              "columns": ["Order #", "Customer", "Date", "Amount", "Status", "Actions"],
+              "rows": 10
+            }
+          ]
+        },
+        {
+          "name": "Products Management Page",
+          "type": "FRAME",
+          "components": [
+            {
+              "name": "Page Header",
+              "type": "COMPONENT",
+              "layout": "horizontal",
+              "children": [
+                {
+                  "name": "Page Title",
+                  "type": "TEXT",
+                  "content": "Products",
+                  "fontSize": 32
+                },
+                {
+                  "name": "Add Product Button",
+                  "type": "BUTTON",
+                  "variant": "primary",
+                  "label": "Add Product",
+                  "icon": "plus"
+                },
+                {
+                  "name": "Export Button",
+                  "type": "BUTTON",
+                  "variant": "outline",
+                  "label": "Export CSV",
+                  "icon": "download"
+                }
+              ]
+            },
+            {
+              "name": "Filters Bar",
+              "type": "COMPONENT",
+              "layout": "horizontal",
+              "children": [
+                {
+                  "name": "Search Input",
+                  "type": "INPUT",
+                  "placeholder": "Search products...",
+                  "icon": "search"
+                },
+                {
+                  "name": "Category Filter",
+                  "type": "SELECT",
+                  "placeholder": "All Categories"
+                },
+                {
+                  "name": "Status Filter",
+                  "type": "SELECT",
+                  "options": ["All", "Active", "Inactive"]
+                }
+              ]
+            },
+            {
+              "name": "Products Table",
+              "type": "COMPONENT",
+              "columns": [
+                {
+                  "name": "Checkbox",
+                  "type": "CHECKBOX",
+                  "width": "40px"
+                },
+                {
+                  "name": "Image",
+                  "type": "IMAGE",
+                  "width": "80px"
+                },
+                {
+                  "name": "Name",
+                  "type": "TEXT",
+                  "width": "300px"
+                },
+                {
+                  "name": "SKU",
+                  "type": "TEXT",
+                  "width": "120px"
+                },
+                {
+                  "name": "Price",
+                  "type": "TEXT",
+                  "width": "100px"
+                },
+                {
+                  "name": "Stock",
+                  "type": "TEXT",
+                  "width": "80px"
+                },
+                {
+                  "name": "Status",
+                  "type": "BADGE",
+                  "width": "100px"
+                },
+                {
+                  "name": "Actions",
+                  "type": "BUTTON",
+                  "width": "150px",
+                  "options": ["Edit", "Delete"]
+                }
+              ],
+              "pagination": true
+            }
+          ]
+        },
+        {
+          "name": "Add/Edit Product Modal",
+          "type": "MODAL",
+          "overlay": true,
+          "components": [
+            {
+              "name": "Modal Header",
+              "type": "COMPONENT",
+              "layout": "horizontal",
+              "children": [
+                {
+                  "name": "Title",
+                  "type": "TEXT",
+                  "content": "Add Product",
+                  "fontSize": 20
+                },
+                {
+                  "name": "Close Button",
+                  "type": "BUTTON",
+                  "icon": "x",
+                  "variant": "ghost"
+                }
+              ]
+            },
+            {
+              "name": "Product Form",
+              "type": "COMPONENT",
+              "layout": "vertical",
+              "children": [
+                {
+                  "name": "Basic Information Section",
+                  "type": "COMPONENT",
+                  "title": "Basic Information",
+                  "fields": [
+                    {
+                      "name": "Product Name",
+                      "type": "INPUT",
+                      "required": true
+                    },
+                    {
+                      "name": "SKU",
+                      "type": "INPUT",
+                      "required": true,
+                      "unique": true
+                    },
+                    {
+                      "name": "Description",
+                      "type": "TEXTAREA",
+                      "rows": 4
+                    },
+                    {
+                      "name": "Category",
+                      "type": "SELECT",
+                      "required": true
+                    },
+                    {
+                      "name": "Brand",
+                      "type": "INPUT"
+                    }
+                  ]
+                },
+                {
+                  "name": "Pricing Section",
+                  "type": "COMPONENT",
+                  "title": "Pricing",
+                  "fields": [
+                    {
+                      "name": "Price",
+                      "type": "INPUT",
+                      "inputType": "number",
+                      "required": true
+                    },
+                    {
+                      "name": "Sale Price",
+                      "type": "INPUT",
+                      "inputType": "number"
+                    },
+                    {
+                      "name": "Cost Price",
+                      "type": "INPUT",
+                      "inputType": "number"
+                    }
+                  ]
+                },
+                {
+                  "name": "Inventory Section",
+                  "type": "COMPONENT",
+                  "title": "Inventory",
+                  "fields": [
+                    {
+                      "name": "Stock Quantity",
+                      "type": "INPUT",
+                      "inputType": "number",
+                      "required": true
+                    },
+                    {
+                      "name": "Min Stock Level",
+                      "type": "INPUT",
+                      "inputType": "number"
+                    },
+                    {
+                      "name": "Max Stock Level",
+                      "type": "INPUT",
+                      "inputType": "number"
+                    }
+                  ]
+                },
+                {
+                  "name": "Images Section",
+                  "type": "COMPONENT",
+                  "title": "Product Images",
+                  "fields": [
+                    {
+                      "name": "Upload Images",
+                      "type": "UPLOAD",
+                      "multiple": true,
+                      "accept": "image/*"
+                    }
+                  ]
+                },
+                {
+                  "name": "Options Section",
+                  "type": "COMPONENT",
+                  "title": "Options",
+                  "fields": [
+                    {
+                      "name": "Featured",
+                      "type": "CHECKBOX"
+                    },
+                    {
+                      "name": "Bestseller",
+                      "type": "CHECKBOX"
+                    },
+                    {
+                      "name": "Active",
+                      "type": "CHECKBOX"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Modal Footer",
+              "type": "COMPONENT",
+              "layout": "horizontal",
+              "children": [
+                {
+                  "name": "Cancel Button",
+                  "type": "BUTTON",
+                  "variant": "outline",
+                  "label": "Cancel"
+                },
+                {
+                  "name": "Save Button",
+                  "type": "BUTTON",
+                  "variant": "primary",
+                  "label": "Save Product"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Orders Management Page",
+          "type": "FRAME",
+          "components": [
+            {
+              "name": "Orders Table",
+              "type": "COMPONENT",
+              "columns": [
+                "Order #",
+                "Customer",
+                "Date",
+                "Amount",
+                "Status",
+                "Actions"
+              ],
+              "sortable": true,
+              "filterable": ["Status", "Date Range"]
+            },
+            {
+              "name": "Status Dropdown",
+              "type": "DROPDOWN",
+              "options": [
+                "Pending",
+                "Processing",
+                "Shipped",
+                "Delivered",
+                "Cancelled"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Order Details Modal",
+          "type": "MODAL",
+          "components": [
+            {
+              "name": "Customer Information",
+              "type": "COMPONENT",
+              "title": "Customer",
+              "fields": [
+                "Name",
+                "Email",
+                "Phone",
+                "Shipping Address",
+                "Billing Address"
+              ]
+            },
+            {
+              "name": "Order Items",
+              "type": "COMPONENT",
+              "title": "Order Items",
+              "layout": "table",
+              "columns": ["Product", "SKU", "Quantity", "Price", "Total"]
+            },
+            {
+              "name": "Order Summary",
+              "type": "COMPONENT",
+              "title": "Summary",
+              "items": [
+                "Subtotal: $299.97",
+                "Shipping: $5.00",
+                "Tax: $30.50",
+                "Total: $335.47"
+              ]
+            },
+            {
+              "name": "Status History",
+              "type": "COMPONENT",
+              "title": "Status History",
+              "timeline": true
+            }
+          ]
+        },
+        {
+          "name": "Users Management Page",
+          "type": "FRAME",
+          "components": [
+            {
+              "name": "Users Table",
+              "type": "COMPONENT",
+              "columns": [
+                "User",
+                "Email",
+                "Role",
+                "Status",
+                "Joined",
+                "Actions"
+              ],
+              "pagination": true
+            },
+            {
+              "name": "Add User Button",
+              "type": "BUTTON",
+              "variant": "primary",
+              "label": "Add User"
+            }
+          ]
+        },
+        {
+          "name": "Add/Edit User Modal",
+          "type": "MODAL",
+          "components": [
+            {
+              "name": "User Form",
+              "type": "COMPONENT",
+              "fields": [
+                {
+                  "name": "Email",
+                  "type": "INPUT",
+                  "inputType": "email",
+                  "required": true
+                },
+                {
+                  "name": "Username",
+                  "type": "INPUT",
+                  "required": true
+                },
+                {
+                  "name": "First Name",
+                  "type": "INPUT",
+                  "required": true
+                },
+                {
+                  "name": "Last Name",
+                  "type": "INPUT",
+                  "required": true
+                },
+                {
+                  "name": "Phone",
+                  "type": "INPUT",
+                  "inputType": "tel"
+                },
+                {
+                  "name": "Role",
+                  "type": "SELECT",
+                  "options": ["Customer", "Admin", "Moderator", "Support"],
+                  "required": true
+                },
+                {
+                  "name": "Active Status",
+                  "type": "TOGGLE"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Reviews Management Page",
+          "type": "FRAME",
+          "components": [
+            {
+              "name": "Reviews Table",
+              "type": "COMPONENT",
+              "columns": [
+                "Product",
+                "User",
+                "Rating",
+                "Comment",
+                "Status",
+                "Date",
+                "Actions"
+              ]
+            },
+            {
+              "name": "Approve Button",
+              "type": "BUTTON",
+              "variant": "success",
+              "icon": "check"
+            },
+            {
+              "name": "Reject Button",
+              "type": "BUTTON",
+              "variant": "danger",
+              "icon": "x"
+            }
+          ]
+        },
+        {
+          "name": "Coupons Management Page",
+          "type": "FRAME",
+          "components": [
+            {
+              "name": "Coupons Table",
+              "type": "COMPONENT",
+              "columns": [
+                "Code",
+                "Name",
+                "Discount Type",
+                "Discount Value",
+                "Usage",
+                "Expiry",
+                "Status",
+                "Actions"
+              ]
+            },
+            {
+              "name": "Add Coupon Button",
+              "type": "BUTTON",
+              "variant": "primary",
+              "label": "Add Coupon"
+            }
+          ]
+        },
+        {
+          "name": "Add/Edit Coupon Modal",
+          "type": "MODAL",
+          "components": [
+            {
+              "name": "Coupon Form",
+              "type": "COMPONENT",
+              "fields": [
+                {
+                  "name": "Code",
+                  "type": "INPUT",
+                  "required": true,
+                  "placeholder": "SAVE20"
+                },
+                {
+                  "name": "Name",
+                  "type": "INPUT",
+                  "required": true,
+                  "placeholder": "20% Off Sale"
+                },
+                {
+                  "name": "Description",
+                  "type": "TEXTAREA",
+                  "rows": 2
+                },
+                {
+                  "name": "Discount Type",
+                  "type": "SELECT",
+                  "options": ["Percentage", "Fixed", "Free Shipping"],
+                  "required": true
+                },
+                {
+                  "name": "Discount Value",
+                  "type": "INPUT",
+                  "inputType": "number",
+                  "required": true
+                },
+                {
+                  "name": "Minimum Order Amount",
+                  "type": "INPUT",
+                  "inputType": "number"
+                },
+                {
+                  "name": "Maximum Uses",
+                  "type": "INPUT",
+                  "inputType": "number"
+                },
+                {
+                  "name": "Valid From",
+                  "type": "DATEPICKER",
+                  "required": true
+                },
+                {
+                  "name": "Valid Until",
+                  "type": "DATEPICKER",
+                  "required": true
+                },
+                {
+                  "name": "Active",
+                  "type": "TOGGLE"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "components": [
+    {
+      "name": "Button",
+      "type": "COMPONENT",
+      "variants": ["primary", "secondary", "outline", "ghost", "danger", "success"],
+      "sizes": ["small", "medium", "large"],
+      "states": ["default", "hover", "active", "disabled"]
+    },
+    {
+      "name": "Input",
+      "type": "COMPONENT",
+      "states": ["default", "focus", "error", "disabled"],
+      "sizes": ["small", "medium", "large"]
+    },
+    {
+      "name": "Card",
+      "type": "COMPONENT",
+      "variants": ["default", "hover", "elevated"],
+      "children": ["header", "body", "footer"]
+    },
+    {
+      "name": "Table",
+      "type": "COMPONENT",
+      "features": ["sortable", "filterable", "selectable", "pagination"],
+      "layouts": ["default", "compact", "spacious"]
+    },
+    {
+      "name": "Modal",
+      "type": "COMPONENT",
+      "variants": ["centered", "fullscreen", "side"],
+      "overlay": true
+    },
+    {
+      "name": "Toast",
+      "type": "COMPONENT",
+      "variants": ["success", "error", "warning", "info"],
+      "position": ["top-right", "top-center", "bottom-right"],
+      "duration": 3000
+    },
+    {
+      "name": "Badge",
+      "type": "COMPONENT",
+      "variants": ["success", "error", "warning", "info", "default"]
+    },
+    {
+      "name": "Loading Spinner",
+      "type": "COMPONENT",
+      "size": ["small", "medium", "large"],
+      "color": "primary"
+    }
+  ],
+  "designTokens": {
+    "colors": {
+      "primary": {
+        "50": "#F0F9FF",
+        "500": "#3B82F6",
+        "600": "#2563EB",
+        "900": "#1E3A8A"
+      },
+      "gray": {
+        "50": "#F9FAFB",
+        "500": "#6B7280",
+        "900": "#111827"
+      },
+      "success": "#22C55E",
+      "error": "#EF4444",
+      "warning": "#F59E0B",
+      "info": "#3B82F6"
+    },
+    "typography": {
+      "fontFamily": "Inter, sans-serif",
+      "sizes": {
+        "xs": "0.75rem",
+        "sm": "0.875rem",
+        "base": "1rem",
+        "lg": "1.125rem",
+        "xl": "1.25rem",
+        "2xl": "1.5rem",
+        "3xl": "1.875rem",
+        "4xl": "2.25rem"
+      },
+      "weights": {
+        "normal": 400,
+        "medium": 500,
+        "semibold": 600,
+        "bold": 700
+      }
+    },
+    "spacing": {
+      "base": "1rem",
+      "scale": [0, 0.25, 0.5, 0.75, 1, 1.5, 2, 3, 4, 6, 8]
+    },
+    "borderRadius": {
+      "none": "0px",
+      "sm": "0.25rem",
+      "md": "0.5rem",
+      "lg": "0.75rem",
+      "xl": "1rem",
+      "full": "9999px"
+    },
+    "shadows": {
+      "sm": "0 1px 2px 0 rgba(0,0,0,0.05)",
+      "md": "0 4px 6px -1px rgba(0,0,0,0.1)",
+      "lg": "0 10px 15px -3px rgba(0,0,0,0.1)",
+      "xl": "0 20px 25px -5px rgba(0,0,0,0.1)"
+    }
+  },
+  "metadata": {
+    "version": "1.0",
+    "created": "2025-10-27",
+    "updated": "2025-10-27",
+    "totalScreens": 25,
+    "totalComponents": 150,
+    "designSystem": "Tailwind CSS",
+    "framework": "React 19"
+  }
+}
+

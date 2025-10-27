@@ -3,7 +3,6 @@ Comprehensive Mock Data Generator for E-Commerce
 Populates database with realistic test data
 """
 import sys
-import requests
 from database import SessionLocal, init_db, drop_db
 from models.user import User
 from models.product import Product, ProductCategory

@@ -567,7 +567,25 @@ async def register(user_data: UserCreate, db: Session = Depends(get_db)):
 @app.post("/auth/login", response_model=TokenResponse)
 async def login(user_data: UserLogin, db: Session = Depends(get_db)):
     """Login user and return JWT tokens"""
-    return login_user(db, user_data)
+    try:
+        return login_user(db, user_data)
+    except HTTPException:
+        # Re-raise HTTP exceptions (401, etc.)
+        raise
+    except Exception as e:
+        # Log the full error for debugging
+        import traceback
+        error_trace = traceback.format_exc()
+        print(f"Login endpoint error: {str(e)}")
+        print(f"Traceback: {error_trace}")
+        # Print to stderr as well for better visibility
+        import sys
+        sys.stderr.write(f"Login endpoint error: {str(e)}\n")
+        sys.stderr.write(f"Traceback: {error_trace}\n")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Login failed: {str(e)}"
+        )
 
 @app.post("/auth/refresh", response_model=TokenResponse)
 async def refresh_token(

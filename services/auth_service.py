@@ -182,52 +182,68 @@ def login_user(db: Session, user_data: UserLogin) -> TokenResponse:
                 detail="Incorrect email or password",
                 headers={"WWW-Authenticate": "Bearer"},
             )
-        
+
         if not user.is_active:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Inactive user",
                 headers={"WWW-Authenticate": "Bearer"},
             )
-        
+
         # Update last login
         user.last_login = datetime.utcnow()
         db.commit()
-        
+
+        # Normalise role to lowercase string for tokens and schema
+        raw_role = getattr(user, "role", None)
+        # raw_role might be an enum or a plain string from the DB
+        if hasattr(raw_role, "value"):
+            role_str = raw_role.value
+        else:
+            role_str = str(raw_role) if raw_role is not None else "customer"
+        role_str = role_str.lower()  # ensure 'ADMIN' -> 'admin'
+
         # Create tokens
         access_token_expires = timedelta(minutes=settings.access_token_expire_minutes)
         access_token = create_access_token(
-            data={"sub": str(user.id), "email": user.email, "role": user.role.value},
-            expires_delta=access_token_expires
+            data={"sub": str(user.id), "email": user.email, "role": role_str},
+            expires_delta=access_token_expires,
         )
-        
+
         refresh_token = create_refresh_token(
             data={"sub": str(user.id), "email": user.email}
         )
-        
-        # Convert user to UserResponse - handle enum conversion
+
+        # Convert user to UserResponse - handle enum conversion safely
         from schemas.user import UserRole as SchemaUserRole
+
+        try:
+            schema_role = SchemaUserRole(role_str)
+        except ValueError:
+            # Fallback to customer if something unexpected is stored
+            schema_role = SchemaUserRole.CUSTOMER
+
         user_dict = {
             "id": user.id,
             "email": user.email,
             "username": user.username,
             "first_name": user.first_name,
             "last_name": user.last_name,
-            "role": SchemaUserRole(user.role.value),  # Convert model enum to schema enum
+            "role": schema_role,
             "is_active": user.is_active,
             "is_verified": user.is_verified,
             "is_email_verified": user.is_email_verified,
             "created_at": user.created_at,
-            "last_login": user.last_login
+            "last_login": user.last_login,
         }
         user_response = UserResponse(**user_dict)
-        
+
         return TokenResponse(
             access_token=access_token,
             token_type="bearer",
             expires_in=settings.access_token_expire_minutes * 60,
             refresh_token=refresh_token,
-            user=user_response
+            user=user_response,
         )
     except HTTPException:
         # Re-raise HTTP exceptions
@@ -240,5 +256,5 @@ def login_user(db: Session, user_data: UserLogin) -> TokenResponse:
         print(f"Traceback: {error_trace}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Login failed: {str(e)}"
+            detail=f"Login failed: {str(e)}",
         )

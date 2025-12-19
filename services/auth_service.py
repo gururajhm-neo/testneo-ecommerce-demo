@@ -195,13 +195,37 @@ def login_user(db: Session, user_data: UserLogin) -> TokenResponse:
         db.commit()
 
         # Normalise role to lowercase string for tokens and schema
+        # Handle both enum objects and string values from database
         raw_role = getattr(user, "role", None)
-        # raw_role might be an enum or a plain string from the DB
-        if hasattr(raw_role, "value"):
-            role_str = raw_role.value
+        
+        if raw_role is None:
+            role_str = "customer"
+        elif hasattr(raw_role, "value"):
+            # It's an enum object, get its value
+            role_str = str(raw_role.value).lower()
+        elif hasattr(raw_role, "name"):
+            # It's an enum but we got the name instead of value
+            # Map enum names to values
+            role_name = str(raw_role.name).upper()
+            role_map = {
+                "CUSTOMER": "customer",
+                "ADMIN": "admin",
+                "MODERATOR": "moderator",
+                "SUPPORT": "support"
+            }
+            role_str = role_map.get(role_name, "customer")
         else:
-            role_str = str(raw_role) if raw_role is not None else "customer"
-        role_str = role_str.lower()  # ensure 'ADMIN' -> 'admin'
+            # It's a string or something else
+            role_str = str(raw_role).lower()
+        
+        # Final normalization - ensure it's lowercase
+        role_str = role_str.lower().strip()
+        
+        # Validate it's a valid role, default to customer if not
+        valid_roles = ["customer", "admin", "moderator", "support"]
+        if role_str not in valid_roles:
+            print(f"Warning: Invalid role '{role_str}', defaulting to 'customer'")
+            role_str = "customer"
 
         # Create tokens
         access_token_expires = timedelta(minutes=settings.access_token_expire_minutes)
@@ -217,10 +241,16 @@ def login_user(db: Session, user_data: UserLogin) -> TokenResponse:
         # Convert user to UserResponse - handle enum conversion safely
         from schemas.user import UserRole as SchemaUserRole
 
+        # Ensure role_str is valid before creating enum (should already be validated above)
+        if role_str not in ["customer", "admin", "moderator", "support"]:
+            print(f"Warning: Invalid role '{role_str}', defaulting to 'customer'")
+            role_str = "customer"
+        
         try:
             schema_role = SchemaUserRole(role_str)
-        except ValueError:
+        except (ValueError, TypeError) as e:
             # Fallback to customer if something unexpected is stored
+            print(f"Error creating SchemaUserRole from '{role_str}': {e}")
             schema_role = SchemaUserRole.CUSTOMER
 
         user_dict = {

@@ -41,8 +41,8 @@ class Settings(BaseSettings):
         "http://44.202.138.57:3000",
     ]
     cors_allow_credentials: bool = True
-    cors_allow_methods: List[str] = ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
-    cors_allow_headers: List[str] = ["Content-Type", "Authorization"]
+    cors_allow_methods: List[str] = ["*"]  # Allow all methods
+    cors_allow_headers: List[str] = ["*"]  # Allow all headers
     
     # Database settings
     database_url: str = "sqlite:///./ecommerce.db"

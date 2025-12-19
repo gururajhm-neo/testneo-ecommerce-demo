@@ -18,6 +18,7 @@ import AdminOrders from './pages/admin/Orders';
 import AdminUsers from './pages/admin/Users';
 import AdminReviews from './pages/admin/Reviews';
 import AdminCoupons from './pages/admin/Coupons';
+import TestComponents from './pages/TestComponents';
 
 const PrivateRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
@@ -63,6 +64,7 @@ function App() {
             <Route path="/order-success/:id" element={<Layout><PrivateRoute><OrderSuccess /></PrivateRoute></Layout>} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/test-components" element={<Layout><TestComponents /></Layout>} />
             
                    {/* Admin Routes */}
                    <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
@@ -71,6 +73,7 @@ function App() {
                    <Route path="/admin/users" element={<AdminRoute><AdminUsers /></AdminRoute>} />
                    <Route path="/admin/reviews" element={<AdminRoute><AdminReviews /></AdminRoute>} />
                    <Route path="/admin/coupons" element={<AdminRoute><AdminCoupons /></AdminRoute>} />
+                   <Route path="/admin/test-components" element={<AdminRoute><TestComponents /></AdminRoute>} />
             
             <Route path="*" element={<Navigate to="/" />} />
         </Routes>

@@ -1,6 +1,10 @@
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://44.202.138.57:9000';
+// Use localhost for local development, remote server for production
+const API_URL = import.meta.env.VITE_API_URL || 
+  (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+    ? 'http://localhost:9000' 
+    : 'http://44.202.138.57:9000');
 
 const api = axios.create({
   baseURL: API_URL,
@@ -118,6 +122,38 @@ export const adminReviewsAPI = {
   approveReview: (id) => api.put(`/admin/reviews/${id}/approve`),
   rejectReview: (id) => api.put(`/admin/reviews/${id}/reject`),
   deleteReview: (id) => api.delete(`/admin/reviews/${id}`),
+};
+
+// Utility function to extract error message from API responses
+export const extractErrorMessage = (error) => {
+  // Handle axios errors
+  if (error.response?.data?.detail) {
+    const detail = error.response.data.detail;
+    if (Array.isArray(detail)) {
+      // Handle Pydantic validation errors
+      return detail.map(d => {
+        if (typeof d === 'object' && d.msg) {
+          return d.msg;
+        } else if (typeof d === 'string') {
+          return d;
+        }
+        return JSON.stringify(d);
+      }).filter(Boolean).join(', ');
+    } else if (typeof detail === 'string') {
+      return detail;
+    } else if (typeof detail === 'object') {
+      // If detail is an object, try to extract a message
+      return detail.message || detail.msg || JSON.stringify(detail);
+    }
+  }
+  
+  // Handle error message
+  if (error.message && typeof error.message === 'string') {
+    return error.message;
+  }
+  
+  // Fallback
+  return 'An unexpected error occurred';
 };
 
 export default api;

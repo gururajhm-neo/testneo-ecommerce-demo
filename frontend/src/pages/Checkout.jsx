@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
-import { ordersAPI } from '../api';
+import { ordersAPI, extractErrorMessage } from '../api';
 import { FiLock, FiCreditCard, FiUser, FiMapPin } from 'react-icons/fi';
 
 const Checkout = () => {
@@ -61,20 +61,8 @@ const Checkout = () => {
       navigate(`/order-success/${response.data.id}`);
     } catch (err) {
       console.error('Order creation failed:', err);
-      
-      // Extract error message properly
-      let errorMsg = 'Failed to create order. Please try again.';
-      if (err.response?.data?.detail) {
-        const detail = err.response.data.detail;
-        if (typeof detail === 'string') {
-          errorMsg = detail;
-        } else if (Array.isArray(detail)) {
-          errorMsg = detail.map(d => typeof d === 'string' ? d : d.msg || d.message).join(', ');
-        } else if (typeof detail === 'object') {
-          errorMsg = detail.msg || detail.message || 'Invalid request data';
-        }
-      }
-      setError(errorMsg);
+      const errorMsg = extractErrorMessage(err);
+      setError(typeof errorMsg === 'string' ? errorMsg : 'Failed to create order. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -237,7 +225,7 @@ const Checkout = () => {
 
             {error && (
               <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-                {error}
+                {String(error)}
               </div>
             )}
 

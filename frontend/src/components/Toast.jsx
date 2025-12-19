@@ -15,7 +15,9 @@ export const ToastProvider = ({ children }) => {
 
   const showToast = (message, type = 'info') => {
     const id = Date.now();
-    setToasts([...toasts, { id, message, type }]);
+    // Ensure message is always a string
+    const messageStr = typeof message === 'string' ? message : String(message);
+    setToasts([...toasts, { id, message: messageStr, type }]);
     return id;
   };
 
@@ -38,7 +40,7 @@ export const ToastProvider = ({ children }) => {
               toast.type === 'warning' ? 'text-yellow-700' :
               'text-blue-700'
             }`}>
-              {toast.message}
+              {String(toast.message)}
             </div>
             <button
               onClick={() => hideToast(toast.id)}

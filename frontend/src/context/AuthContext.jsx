@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import { authAPI } from '../api';
+import { authAPI, extractErrorMessage } from '../api';
 
 const AuthContext = createContext(null);
 
@@ -24,7 +24,11 @@ export const AuthProvider = ({ children }) => {
           setUser(response.data);
           setIsAuthenticated(true);
         })
-        .catch(() => {
+        .catch((error) => {
+          // Silently handle 401 errors (invalid/expired token)
+          if (error.response?.status !== 401) {
+            console.error('Failed to get current user:', error);
+          }
           localStorage.removeItem('access_token');
           localStorage.removeItem('refresh_token');
         })
@@ -44,7 +48,8 @@ export const AuthProvider = ({ children }) => {
       setIsAuthenticated(true);
       return response.data;
     } catch (error) {
-      // Re-throw the error so the Login page can handle it
+      // Re-throw the error with standardized message
+      error.message = extractErrorMessage(error);
       throw error;
     }
   };

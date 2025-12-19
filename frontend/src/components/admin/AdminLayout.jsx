@@ -11,6 +11,7 @@ import {
   FiMenu,
   FiX,
   FiTag,
+  FiCode,
 } from 'react-icons/fi';
 
 const AdminLayout = ({ children }) => {
@@ -30,7 +31,11 @@ const AdminLayout = ({ children }) => {
     { icon: FiUsers, label: 'Users', path: '/admin/users' },
     { icon: FiMessageSquare, label: 'Reviews', path: '/admin/reviews' },
     { icon: FiTag, label: 'Coupons', path: '/admin/coupons' },
+    { icon: FiCode, label: 'Test Components', path: '/admin/test-components' },
   ];
+
+  // Debug: Log menu items
+  console.log('AdminLayout menuItems:', menuItems);
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -89,6 +94,24 @@ const AdminLayout = ({ children }) => {
 
         {/* Main Content */}
         <main className="flex-1 ml-0 md:ml-64 p-8">
+          {/* Test Components Banner - Always Visible */}
+          <div className="mb-6 bg-gradient-to-r from-purple-600 to-purple-700 rounded-lg shadow-lg p-4 text-white">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <FiCode className="w-6 h-6" />
+                <div>
+                  <h3 className="text-lg font-bold">TestNeo UI Components</h3>
+                  <p className="text-sm text-purple-100">Test complex UI components for automation</p>
+                </div>
+              </div>
+              <Link
+                to="/admin/test-components"
+                className="px-4 py-2 bg-white text-purple-600 rounded-lg hover:bg-purple-50 transition font-semibold"
+              >
+                Open →
+              </Link>
+            </div>
+          </div>
           {children}
         </main>
 

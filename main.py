@@ -2,9 +2,11 @@
 E-commerce Testing API - Main Application
 Industry-best-practice internal testing product for comprehensive API testing
 """
-from fastapi import FastAPI, Depends, HTTPException, status, Query, BackgroundTasks
+from fastapi import FastAPI, Depends, HTTPException, status, Query, BackgroundTasks, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi.responses import JSONResponse
+from fastapi.exceptions import RequestValidationError
 from sqlalchemy.orm import Session
 from typing import List, Optional, Dict, Any
 from contextlib import asynccontextmanager
@@ -12,6 +14,7 @@ from datetime import datetime, timedelta
 import uuid
 import json
 import secrets
+import traceback
 
 # Import database and models
 from database import get_db, init_db
@@ -81,14 +84,58 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# Add CORS middleware
+# Add CORS middleware - must be before routes
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins,
-    allow_credentials=settings.cors_allow_credentials,
-    allow_methods=settings.cors_allow_methods,
-    allow_headers=settings.cors_allow_headers,
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    allow_headers=["*"],
+    expose_headers=["*"],
 )
+
+# Global exception handler to ensure CORS headers are always included
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    """Global exception handler that ensures CORS headers are included"""
+    # Get origin from request
+    origin = request.headers.get("origin")
+    
+    # Check if origin is allowed
+    if origin and origin in settings.cors_origins:
+        headers = {
+            "Access-Control-Allow-Origin": origin,
+            "Access-Control-Allow-Credentials": "true",
+            "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS, PATCH",
+            "Access-Control-Allow-Headers": "*",
+        }
+    else:
+        headers = {}
+    
+    # Handle HTTPException
+    if isinstance(exc, HTTPException):
+        return JSONResponse(
+            status_code=exc.status_code,
+            content={"detail": exc.detail},
+            headers=headers
+        )
+    
+    # Handle validation errors
+    if isinstance(exc, RequestValidationError):
+        return JSONResponse(
+            status_code=422,
+            content={"detail": exc.errors()},
+            headers=headers
+        )
+    
+    # Handle other exceptions
+    print(f"Unhandled exception: {exc}")
+    print(traceback.format_exc())
+    return JSONResponse(
+        status_code=500,
+        content={"detail": "Internal server error"},
+        headers=headers
+    )
 
 # Security
 security = HTTPBearer()
@@ -493,7 +540,29 @@ async def create_sample_data():
 @app.post("/auth/register", response_model=UserResponse, status_code=201)
 async def register(user_data: UserCreate, db: Session = Depends(get_db)):
     """Register a new user"""
-    return register_user(db, user_data)
+    try:
+        db_user = register_user(db, user_data)
+        # Convert User model to UserResponse
+        return UserResponse(
+            id=db_user.id,
+            email=db_user.email,
+            username=db_user.username,
+            first_name=db_user.first_name,
+            last_name=db_user.last_name,
+            role=db_user.role,
+            is_active=db_user.is_active,
+            is_verified=db_user.is_verified,
+            is_email_verified=db_user.is_email_verified,
+            created_at=db_user.created_at,
+            last_login=db_user.last_login
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Registration error: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Registration failed: {str(e)}")
 
 @app.post("/auth/login", response_model=TokenResponse)
 async def login(user_data: UserLogin, db: Session = Depends(get_db)):

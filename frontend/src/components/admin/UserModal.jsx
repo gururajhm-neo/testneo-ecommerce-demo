@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { adminUsersAPI } from '../../api';
+import { adminUsersAPI, extractErrorMessage } from '../../api';
 import { useToast } from '../Toast';
 import { FiX } from 'react-icons/fi';
 
@@ -87,7 +87,8 @@ const UserModal = ({ isOpen, onClose, userId, onSuccess }) => {
       onClose();
     } catch (error) {
       console.error('Error saving user:', error);
-      showToast('Failed to save user. ' + (error.response?.data?.detail || ''), 'error');
+      const errorMsg = extractErrorMessage(error);
+      showToast(typeof errorMsg === 'string' ? errorMsg : 'Failed to save user', 'error');
     } finally {
       setLoading(false);
     }

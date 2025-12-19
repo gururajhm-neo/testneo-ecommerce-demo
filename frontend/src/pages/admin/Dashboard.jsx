@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { adminAPI } from '../../api';
-import { FiPackage, FiShoppingBag, FiUsers, FiCreditCard, FiTrendingUp, FiAlertCircle, FiCheckCircle } from 'react-icons/fi';
+import { Link } from 'react-router-dom';
+import { adminAPI, extractErrorMessage } from '../../api';
+import { FiPackage, FiShoppingBag, FiUsers, FiCreditCard, FiTrendingUp, FiAlertCircle, FiCheckCircle, FiCode } from 'react-icons/fi';
 
 const Dashboard = () => {
   const [stats, setStats] = useState(null);
@@ -17,7 +18,8 @@ const Dashboard = () => {
       setStats(response.data);
     } catch (err) {
       console.error('Error fetching stats:', err);
-      setError('Failed to load dashboard statistics');
+      const errorMsg = extractErrorMessage(err);
+      setError(typeof errorMsg === 'string' ? errorMsg : 'Failed to load dashboard statistics');
     } finally {
       setLoading(false);
     }
@@ -34,7 +36,7 @@ const Dashboard = () => {
   if (error) {
     return (
       <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-        {error}
+        {String(error)}
       </div>
     );
   }
@@ -46,6 +48,25 @@ const Dashboard = () => {
 
   return (
     <div className="space-y-6">
+      {/* Prominent Test Components Banner */}
+      <div className="bg-gradient-to-r from-purple-600 to-purple-700 rounded-lg shadow-lg p-6 text-white">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <FiCode className="w-8 h-8" />
+            <div>
+              <h2 className="text-2xl font-bold mb-1">TestNeo UI Components</h2>
+              <p className="text-purple-100">Test complex UI components for web automation</p>
+            </div>
+          </div>
+          <Link
+            to="/admin/test-components"
+            className="px-6 py-3 bg-white text-purple-600 rounded-lg hover:bg-purple-50 transition font-bold text-lg shadow-lg"
+          >
+            Open Test Components →
+          </Link>
+        </div>
+      </div>
+
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
         <button 

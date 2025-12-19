@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { extractErrorMessage } from '../api';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -26,17 +27,9 @@ const Login = () => {
       }
     } catch (err) {
       console.error('Login error:', err);
-      // Handle different error formats
-      let errorMsg = 'Login failed';
-      if (err.response?.data?.detail) {
-        const detail = err.response.data.detail;
-        if (Array.isArray(detail)) {
-          errorMsg = detail.map(d => d.msg).join(', ');
-        } else if (typeof detail === 'string') {
-          errorMsg = detail;
-        }
-      }
-      setError(errorMsg);
+      const errorMsg = extractErrorMessage(err);
+      // Ensure error is always a string
+      setError(typeof errorMsg === 'string' ? errorMsg : 'Login failed');
     } finally {
       setLoading(false);
     }
@@ -49,7 +42,7 @@ const Login = () => {
         
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
-            {error}
+            {String(error)}
           </div>
         )}
 

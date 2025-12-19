@@ -139,18 +139,33 @@ def register_user(db: Session, user_data: UserCreate) -> User:
             detail="Username already taken"
         )
     
-    # Create new user
-    hashed_password = get_password_hash(user_data.password)
+    # Create new user - use User constructor which will hash the password
+    # The User.__init__ expects 'password' (not password_hash) and will hash it
+    # Convert schema UserRole enum to model UserRole enum
+    from models.user import UserRole as ModelUserRole
+    # Get the string value from the schema enum (e.g., "customer") and convert to model enum
+    role_value = user_data.role.value if hasattr(user_data.role, 'value') else str(user_data.role)
+    # Model UserRole enum: CUSTOMER = "customer", so we need to find by value
+    # Find the enum member by its value
+    user_role = None
+    for role in ModelUserRole:
+        if role.value == role_value.lower():
+            user_role = role
+            break
+    if user_role is None:
+        # Default to CUSTOMER if not found
+        user_role = ModelUserRole.CUSTOMER
+    
     db_user = User(
         email=user_data.email,
         username=user_data.username,
-        password_hash=hashed_password,
+        password=user_data.password,  # Pass plain password, User.__init__ will hash it
         first_name=user_data.first_name,
         last_name=user_data.last_name,
         phone=user_data.phone,
-        role=user_data.role,
-        email_verification_token=secrets.token_urlsafe(32)
+        role=user_role
     )
+    # User.__init__ already sets email_verification_token via generate_verification_token()
     
     db.add(db_user)
     db.commit()

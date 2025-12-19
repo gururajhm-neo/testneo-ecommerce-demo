@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { authAPI } from '../api';
+import { authAPI, extractErrorMessage } from '../api';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -30,7 +30,9 @@ const Register = () => {
       await authAPI.register(formData);
       navigate('/login');
     } catch (err) {
-      setError(err.response?.data?.detail || 'Registration failed');
+      const errorMsg = extractErrorMessage(err);
+      // Ensure error is always a string
+      setError(typeof errorMsg === 'string' ? errorMsg : 'Registration failed');
     } finally {
       setLoading(false);
     }
@@ -43,7 +45,7 @@ const Register = () => {
         
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
-            {error}
+            {String(error)}
           </div>
         )}
 

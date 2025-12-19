@@ -21,7 +21,10 @@ export const CartProvider = ({ children }) => {
       const response = await cartAPI.getCart();
       setCart(response.data);
     } catch (error) {
-      console.error('Failed to fetch cart:', error);
+      // Silently handle 401 errors (user not authenticated)
+      if (error.response?.status !== 401) {
+        console.error('Failed to fetch cart:', error);
+      }
       setCart(null);
     } finally {
       setLoading(false);

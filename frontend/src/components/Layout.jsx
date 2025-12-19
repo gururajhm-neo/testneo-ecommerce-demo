@@ -23,6 +23,9 @@ const Layout = ({ children }) => {
               <Link to="/products" className="text-gray-700 hover:text-primary-600 transition">
                 Products
               </Link>
+              <Link to="/test-components" className="text-gray-700 hover:text-primary-600 transition">
+                Test Components
+              </Link>
               {isAdmin && (
                 <Link to="/admin" className="flex items-center space-x-1 text-purple-600 hover:text-purple-700 transition">
                   <FiShield className="w-5 h-5" />

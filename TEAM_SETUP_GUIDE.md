@@ -8,6 +8,31 @@ This repository contains a FastAPI backend and a React/Vite frontend for the Tes
 - Seeded demo data including admin, moderator, and customer accounts
 - Simple scripts to start/stop the services
 
+## Install dependencies
+If you are setting up the project for the first time, run these commands from the repository root:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install --upgrade pip
+pip install -r requirements.txt
+cd frontend
+npm install
+cd ..
+```
+
+If you are on Windows PowerShell, use:
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install --upgrade pip
+pip install -r requirements.txt
+cd frontend
+npm install
+cd ..
+```
+
 ## Default login credentials
 The seed data creates these accounts automatically on first backend startup:
 
@@ -60,20 +85,32 @@ From the repo root:
 ./start_frontend.sh
 ```
 
-The frontend will run on:
+The frontend will be available at:
 - http://127.0.0.1:3001
+- http://localhost:3001
 
 ## 6) Start both services together
 ```bash
 ./start_all.sh
 ```
 
+This starts both the backend and frontend in one go.
+
 ## 7) Stop both services
 ```bash
 ./stop_all.sh
 ```
 
-## 8) Quick health check
+## 8) Seed the demo data
+The demo data is created automatically when the backend starts. If you want to seed it manually at any time, run:
+
+```bash
+./.venv/bin/python populate_mock_data.py
+```
+
+This creates users, products, orders, reviews, coupons, cart items, and wishlist items.
+
+## 9) Quick health check
 Backend:
 ```bash
 python3 check_backend.py
@@ -84,7 +121,7 @@ Frontend:
 curl http://127.0.0.1:3001
 ```
 
-## 9) Useful endpoints
+## 10) Useful endpoints
 - Health: http://127.0.0.1:9000/health
 - Products: http://127.0.0.1:9000/products
 - Login: POST http://127.0.0.1:9000/auth/login
@@ -96,7 +133,7 @@ curl -X POST http://127.0.0.1:9000/auth/login \
   -d '{"email":"admin@ecommerce.com","password":"admin123"}'
 ```
 
-## 10) Repo structure overview
+## 11) Repo structure overview
 - main.py - FastAPI entry point
 - populate_mock_data.py - Seed data generation
 - models/ - Database models

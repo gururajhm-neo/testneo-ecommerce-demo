@@ -6,6 +6,7 @@ import { FiShoppingCart, FiTrash2, FiMinus, FiPlus } from 'react-icons/fi';
 const Cart = () => {
   const { cart, updateCartItem, removeFromCart, loading } = useCart();
   const navigate = useNavigate();
+  const cartItems = cart?.items || [];
 
   const handleQuantityChange = async (itemId, newQuantity) => {
     if (newQuantity > 0) {
@@ -28,7 +29,7 @@ const Cart = () => {
     );
   }
 
-  if (!cart || cart.items.length === 0) {
+  if (!cart || cartItems.length === 0) {
     return (
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-2xl mx-auto text-center">
@@ -55,7 +56,7 @@ const Cart = () => {
         <div className="lg:col-span-2">
           <div className="bg-white rounded-lg shadow-md p-6">
             <div className="space-y-6">
-              {cart.items.map((item) => (
+              {cartItems.map((item) => (
                 <div key={item.id} className="flex gap-4 pb-6 border-b last:border-b-0">
                   {/* Product Image */}
                   <div className="w-24 h-24 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -121,11 +122,11 @@ const Cart = () => {
             <div className="space-y-4 mb-6">
               <div className="flex justify-between">
                 <span className="text-gray-600">Items</span>
-                <span className="font-semibold">{cart.total_items}</span>
+                <span className="font-semibold">{cart?.total_items || 0}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Subtotal</span>
-                <span className="font-semibold">${cart.total_amount.toFixed(2)}</span>
+                <span className="font-semibold">${(cart?.total_amount || 0).toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Shipping</span>
@@ -135,7 +136,7 @@ const Cart = () => {
                 <div className="flex justify-between">
                   <span className="text-lg font-bold text-gray-800">Total</span>
                   <span className="text-lg font-bold text-primary-600">
-                    ${cart.total_amount.toFixed(2)}
+                    ${(cart?.total_amount || 0).toFixed(2)}
                   </span>
                 </div>
               </div>

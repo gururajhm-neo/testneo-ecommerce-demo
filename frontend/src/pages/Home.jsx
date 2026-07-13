@@ -73,12 +73,12 @@ const Home = () => {
       <section className="py-16 bg-gray-50">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold text-gray-900 mb-4">Ready to Start Shopping?</h2>
-          <p className="text-gray-600 mb-8">Join thousands of satisfied customers today</p>
+          <p className="text-gray-600 mb-8">Browse products or sign in with your account</p>
           <Link
-            to="/register"
+            to="/login"
             className="inline-block px-8 py-3 bg-primary-600 text-white rounded-lg font-semibold hover:bg-primary-700 transition"
           >
-            Create Account
+            Sign In
           </Link>
         </div>
       </section>

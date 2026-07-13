@@ -11,7 +11,6 @@ import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
 import OrderSuccess from './pages/OrderSuccess';
 import Login from './pages/Login';
-import Register from './pages/Register';
 import AdminDashboard from './pages/admin/Dashboard';
 import AdminProducts from './pages/admin/Products';
 import AdminOrders from './pages/admin/Orders';
@@ -63,7 +62,8 @@ function App() {
             <Route path="/checkout" element={<Layout><PrivateRoute><Checkout /></PrivateRoute></Layout>} />
             <Route path="/order-success/:id" element={<Layout><PrivateRoute><OrderSuccess /></PrivateRoute></Layout>} />
             <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
+            {/* Public registration disabled — admins create users from /admin/users */}
+            <Route path="/register" element={<Navigate to="/login" replace />} />
             <Route path="/test-components" element={<Layout><TestComponents /></Layout>} />
             
                    {/* Admin Routes */}

@@ -189,7 +189,7 @@ async def api_info():
         "description": "Industry-best-practice internal testing product",
         "endpoints": {
             "authentication": [
-                "POST /auth/register - User registration",
+                "POST /auth/register - Create user (admin only)",
                 "POST /auth/login - User login",
                 "POST /auth/refresh - Refresh token",
                 "POST /auth/logout - User logout"
@@ -283,43 +283,19 @@ async def create_sample_data():
     create_mock_data()
 
 
-@app.post("/auth/register", response_model=UserResponse, status_code=201)
-async def register(user_data: UserCreate, db: Session = Depends(get_db)):
-    """Register a new user"""
-    try:
-        db_user = register_user(db, user_data)
-        # Convert User model to UserResponse
-        return UserResponse(
-            id=db_user.id,
-            email=db_user.email,
-            username=db_user.username,
-            first_name=db_user.first_name,
-            last_name=db_user.last_name,
-            role=db_user.role,
-            is_active=db_user.is_active,
-            is_verified=db_user.is_verified,
-            is_email_verified=db_user.is_email_verified,
-            created_at=db_user.created_at,
-            last_login=db_user.last_login
-        )
-    except HTTPException:
-        raise
-    except Exception as e:
-        print(f"Registration error: {e}")
-        import traceback
-        traceback.print_exc()
-        raise HTTPException(status_code=500, detail=f"Registration failed: {str(e)}")
-
 # ============================================================================
 # AUTHENTICATION ENDPOINTS
 # ============================================================================
 
 @app.post("/auth/register", response_model=UserResponse, status_code=201)
-async def register(user_data: UserCreate, db: Session = Depends(get_db)):
-    """Register a new user"""
+async def register(
+    user_data: UserCreate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_admin_user),
+):
+    """Create a user — admin only (public self-registration is disabled)."""
     try:
         db_user = register_user(db, user_data)
-        # Convert User model to UserResponse
         return UserResponse(
             id=db_user.id,
             email=db_user.email,

@@ -2546,10 +2546,17 @@ async def admin_stats(
     }
 
 if __name__ == "__main__":
+    import os
     import uvicorn
+
+    # Always bind demo API to 9000 on shared EC2 (main TestNeo uses 8000).
+    # Override only with ECOM_PORT / ECOM_HOST — never inherit generic PORT.
+    bind_host = os.environ.get("ECOM_HOST", settings.host or "0.0.0.0")
+    bind_port = int(os.environ.get("ECOM_PORT", "9000"))
+    print(f"Starting ecommerce API on {bind_host}:{bind_port}")
     uvicorn.run(
-        app, 
-        host=settings.host, 
-        port=settings.port,
-        log_level="info"
+        app,
+        host=bind_host,
+        port=bind_port,
+        log_level="info",
     )

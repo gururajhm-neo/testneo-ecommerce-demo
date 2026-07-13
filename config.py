@@ -1,7 +1,7 @@
 """
 Configuration settings for E-commerce Testing API
 """
-from pydantic import field_validator
+from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings
 from typing import List, Any
 import json
@@ -80,6 +80,10 @@ def _normalize_list_env_vars() -> None:
 
 _normalize_list_env_vars()
 
+# Shared EC2 often has PORT=8000 for main TestNeo — never let that steal this app.
+# This demo listens on 9000 unless ECOM_PORT is set explicitly.
+os.environ.pop("PORT", None)
+
 
 class Settings(BaseSettings):
     """Application settings"""
@@ -88,8 +92,9 @@ class Settings(BaseSettings):
     app_version: str = "1.0.0"
     debug: bool = True
 
-    host: str = "0.0.0.0"
-    port: int = 9000
+    # Use ECOM_HOST / ECOM_PORT only — ignore generic HOST/PORT from other apps
+    host: str = Field(default="0.0.0.0", validation_alias="ECOM_HOST")
+    port: int = Field(default=9000, validation_alias="ECOM_PORT")
 
     secret_key: str = "your-secret-key-change-in-production"
     jwt_secret_key: str = "your-jwt-secret-key-change-in-production"
@@ -151,6 +156,7 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"
         case_sensitive = False
+        populate_by_name = True
 
 
 settings = Settings()

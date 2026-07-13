@@ -1,10 +1,10 @@
 import axios from 'axios';
 
-// Use localhost for local development, remote server for production
-const API_URL = import.meta.env.VITE_API_URL || 
-  (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
-    ? 'http://localhost:9000' 
-    : 'http://44.202.138.57:9000');
+// Prefer VITE_API_URL; otherwise same host as the UI (works for any EC2 public IP)
+const API_URL = import.meta.env.VITE_API_URL ||
+  (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? 'http://localhost:9000'
+    : `http://${window.location.hostname}:9000`);
 
 const api = axios.create({
   baseURL: API_URL,

@@ -17,9 +17,14 @@ Started services.
 Backend PID: $BACKEND_PID
 Frontend PID: $FRONTEND_PID
 
-Open:
+Open (local):
 - http://127.0.0.1:9000
 - http://127.0.0.1:3001
+
+Open (EC2 public):
+- http://34.229.255.219:9000
+- http://34.229.255.219:3001
+- http://34.229.255.219:3001/login
 
 Stop them with:
 - ./stop_all.sh

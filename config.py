@@ -41,6 +41,10 @@ class Settings(BaseSettings):
         "http://44.202.138.57:3000",
         "http://34.229.255.219:3001",
         "http://34.229.255.219:3000",
+        "http://testneo-ecom.testneo.ai",
+        "https://testneo-ecom.testneo.ai",
+        "http://testneo-ecom.testneo.ai:3001",
+        "https://testneo-ecom.testneo.ai:3001",
     ]
     cors_allow_credentials: bool = True
     cors_allow_methods: List[str] = ["*"]  # Allow all methods

@@ -1,15 +1,14 @@
 #!/bin/bash
-# Upgrade Node.js to version 18+ on EC2
+# Upgrade Node.js to version 20+ on EC2 (required by Vite 7)
 # Run: bash upgrade_node_ec2.sh
 
 set -e
 
 echo "=========================================="
-echo "Upgrading Node.js for Vite Compatibility"
+echo "Upgrading Node.js for Vite 7 Compatibility"
 echo "=========================================="
 echo ""
 
-# Check current version
 CURRENT_NODE=$(node --version 2>/dev/null || echo "not installed")
 echo "Current Node.js: $CURRENT_NODE"
 echo ""
@@ -17,23 +16,20 @@ echo ""
 # Install nvm if not present
 if [ ! -d "$HOME/.nvm" ]; then
     echo "Installing nvm..."
-    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
-    export NVM_DIR="$HOME/.nvm"
-    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-    [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
 fi
 
-# Load nvm
 export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+# shellcheck disable=SC1091
+[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+# shellcheck disable=SC1091
+[ -s "$NVM_DIR/bash_completion" ] && . "$NVM_DIR/bash_completion"
 
-# Install Node.js 18 (LTS)
-echo "Installing Node.js 18 (LTS)..."
-nvm install 18
-nvm use 18
-nvm alias default 18
+echo "Installing Node.js 20 (LTS)..."
+nvm install 20
+nvm use 20
+nvm alias default 20
 
-# Verify installation
 echo ""
 echo "=========================================="
 echo "Verification"
@@ -43,5 +39,8 @@ npm --version
 
 echo ""
 echo "✓ Node.js upgraded successfully!"
-echo "Now run: cd frontend && npm install && npm run dev"
-
+echo "Next:"
+echo "  cd ~/testneo-ecommerce-demo/frontend"
+echo "  rm -rf node_modules"
+echo "  npm install"
+echo "  cd .. && ./stop_all.sh && ./start_all.sh"

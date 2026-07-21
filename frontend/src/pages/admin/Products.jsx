@@ -24,6 +24,27 @@ const CATEGORIES = [
   { value: 'gardening',   label: 'Gardening' },
 ];
 
+const CATEGORY_COLORS = {
+  electronics: 'bg-blue-100 text-blue-700',
+  clothing:    'bg-pink-100 text-pink-700',
+  books:       'bg-yellow-100 text-yellow-700',
+  home_garden: 'bg-green-100 text-green-700',
+  sports:      'bg-orange-100 text-orange-700',
+  beauty:      'bg-purple-100 text-purple-700',
+  toys:        'bg-red-100 text-red-700',
+  automotive:  'bg-gray-100 text-gray-700',
+  health:      'bg-teal-100 text-teal-700',
+  food:        'bg-lime-100 text-lime-700',
+  jewelry:     'bg-amber-100 text-amber-700',
+  furniture:   'bg-stone-100 text-stone-700',
+  music:       'bg-indigo-100 text-indigo-700',
+  movies:      'bg-cyan-100 text-cyan-700',
+  gardening:   'bg-emerald-100 text-emerald-700',
+};
+
+const categoryLabel = (value) =>
+  CATEGORIES.find((c) => c.value === value)?.label || value;
+
 const Products = () => {
   const [products, setProducts]             = useState([]);
   const [allProducts, setAllProducts]       = useState([]);
@@ -238,6 +259,7 @@ const Products = () => {
           <thead className="bg-gray-50">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stock</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
@@ -247,7 +269,7 @@ const Products = () => {
           <tbody className="bg-white divide-y divide-gray-200">
             {currentProducts.length === 0 ? (
               <tr>
-                <td colSpan={5} className="px-6 py-12 text-center text-sm text-gray-400">
+                <td colSpan={6} className="px-6 py-12 text-center text-sm text-gray-400">
                   No products found
                 </td>
               </tr>
@@ -268,6 +290,11 @@ const Products = () => {
                       <div className="text-xs text-gray-400">{product.sku}</div>
                     </div>
                   </div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${CATEGORY_COLORS[product.category] || 'bg-gray-100 text-gray-700'}`}>
+                    {categoryLabel(product.category)}
+                  </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                   ${(product.current_price || product.price || 0).toFixed(2)}

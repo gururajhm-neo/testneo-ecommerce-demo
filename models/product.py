@@ -116,16 +116,19 @@ class Product(Base):
         Index('idx_product_featured', 'is_featured', 'is_active'),
     )
     
-    def __init__(self, name: str, price: float, category: ProductCategory, sku: str, 
-                 description: str = None, brand: str = None):
-        """Initialize product with required fields"""
-        self.name = name
-        self.price = price
-        self.category = category
-        self.sku = sku
-        self.description = description
-        self.brand = brand
-        self.published_at = datetime.utcnow()
+    def __init__(self, **kwargs):
+        """
+        Accept full ProductCreate payloads (sale_price, stock_quantity, etc.).
+
+        The old signature only allowed name/price/category/sku/description/brand,
+        so Product(**product_data.dict()) raised TypeError → HTTP 500 on create.
+        """
+        category = kwargs.get("category")
+        if category is not None and hasattr(category, "value"):
+            kwargs["category"] = category.value
+        if kwargs.get("published_at") is None:
+            kwargs.setdefault("published_at", datetime.utcnow())
+        super().__init__(**kwargs)
     
     @property
     def available_quantity(self) -> int:

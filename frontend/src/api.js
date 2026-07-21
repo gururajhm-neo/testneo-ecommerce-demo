@@ -111,6 +111,13 @@ export const adminProductsAPI = {
   deleteProduct: (id) => api.delete(`/products/${id}`),
 };
 
+// Admin - Coupons
+export const adminCouponsAPI = {
+  list: (params = {}) => api.get('/coupons', { params }),
+  create: (data) => api.post('/coupons', data),
+  update: (id, data) => api.put(`/coupons/${id}`, data),
+};
+
 // Admin - Orders
 export const adminOrdersAPI = {
   getAllOrders: (params = {}) => api.get('/orders', { params }),

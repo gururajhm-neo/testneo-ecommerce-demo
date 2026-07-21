@@ -564,12 +564,18 @@ async def create_product(
     # Check if SKU already exists
     if db.query(Product).filter(Product.sku == product_data.sku).first():
         raise HTTPException(status_code=400, detail="SKU already exists")
-    
-    db_product = Product(**product_data.dict())
-    db.add(db_product)
-    db.commit()
-    db.refresh(db_product)
-    return db_product
+
+    try:
+        payload = product_data.dict() if hasattr(product_data, "dict") else product_data.model_dump()
+        db_product = Product(**payload)
+        db.add(db_product)
+        db.commit()
+        db.refresh(db_product)
+        return db_product
+    except Exception as e:
+        db.rollback()
+        # Surface IntegrityError / unexpected failures clearly (not opaque 500)
+        raise HTTPException(status_code=500, detail=f"Failed to create product: {e}") from e
 
 @app.put("/products/{product_id}", response_model=ProductResponse)
 async def update_product(
@@ -1177,12 +1183,12 @@ async def create_coupon(
 @app.get("/coupons", response_model=List[CouponResponse])
 async def list_coupons(
     skip: int = Query(0, ge=0),
-    limit: int = Query(20, ge=1, le=100),
+    limit: int = Query(100, ge=1, le=200),
     current_user: User = Depends(get_current_admin_user),
     db: Session = Depends(get_db)
 ):
     """List all coupons (admin only)"""
-    coupons = db.query(Coupon).offset(skip).limit(limit).all()
+    coupons = db.query(Coupon).order_by(Coupon.id.desc()).offset(skip).limit(limit).all()
     return coupons
 
 @app.get("/coupons/{code}")

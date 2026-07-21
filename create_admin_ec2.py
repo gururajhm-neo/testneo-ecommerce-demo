@@ -60,7 +60,7 @@ def create_or_update_admin():
         print(f"Active: {admin_user.is_active}")
         print(f"Verified: {admin_user.is_verified}")
         print("\nYou can now login to the admin panel at:")
-        print("http://44.202.138.57:3001/login")
+        print("http://34.229.255.219:3001/login")
         print("============================================================")
 
     except Exception as e:

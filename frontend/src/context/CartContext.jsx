@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { cartAPI } from '../api';
+import { useAuth } from './AuthContext';
 
 const CartContext = createContext(null);
 
@@ -14,8 +15,15 @@ export const useCart = () => {
 export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState(null);
   const [loading, setLoading] = useState(false);
+  const { isAuthenticated } = useAuth();
 
   const fetchCart = async () => {
+    if (!localStorage.getItem('access_token')) {
+      setCart(null);
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
       const response = await cartAPI.getCart();
@@ -76,11 +84,14 @@ export const CartProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    const token = localStorage.getItem('access_token');
-    if (token) {
-      fetchCart();
+    if (!isAuthenticated) {
+      setCart(null);
+      setLoading(false);
+      return;
     }
-  }, []);
+
+    fetchCart();
+  }, [isAuthenticated]);
 
   const value = {
     cart,

@@ -4,12 +4,14 @@ Populates database with realistic test data
 """
 import sys
 from database import SessionLocal, init_db, drop_db
-from models.user import User
+from models.user import User, UserRole
 from models.product import Product, ProductCategory
 from models.order import Order, PaymentMethod, OrderStatus, ShippingMethod, PaymentStatus
 from models.order import OrderItem
 from models.review import Review
 from models.coupon import Coupon, DiscountType
+from models.cart import CartItem
+from models.wishlist import WishlistItem
 from datetime import datetime, timedelta
 from passlib.context import CryptContext
 import random
@@ -34,15 +36,37 @@ def create_mock_data():
             print("\nData already exists. Skipping population.")
             return
         
-        print("\n[1/5] Creating Users...")
-        # Create additional users
+        print("\n[1/6] Creating Users...")
+        # Create admin and moderator users
+        default_users = [
+            {"email": "admin@ecommerce.com", "username": "admin", "password": "admin123", "first_name": "Admin", "last_name": "User", "role": "ADMIN"},
+            {"email": "moderator@ecommerce.com", "username": "moderator", "password": "moderator123", "first_name": "Moderator", "last_name": "User", "role": "MODERATOR"},
+        ]
+
+        created_users = 0
+        for user_data in default_users:
+            if not db.query(User).filter(User.email == user_data["email"]).first():
+                user = User(
+                    email=user_data["email"],
+                    username=user_data["username"],
+                    password=user_data["password"],
+                    first_name=user_data["first_name"],
+                    last_name=user_data["last_name"],
+                    role=getattr(UserRole, user_data["role"])
+                )
+                user.is_active = True
+                user.is_verified = True
+                user.is_email_verified = True
+                db.add(user)
+                created_users += 1
+
+        print("\n[1.1/6] Creating customer users...")
         customers = [
             {"email": "john@test.com", "username": "john_doe", "password": "john123", "first_name": "John", "last_name": "Doe"},
             {"email": "jane@test.com", "username": "jane_smith", "password": "jane123", "first_name": "Jane", "last_name": "Smith"},
             {"email": "bob@test.com", "username": "bob_wilson", "password": "bob123", "first_name": "Bob", "last_name": "Wilson"},
             {"email": "alice@test.com", "username": "alice_brown", "password": "alice123", "first_name": "Alice", "last_name": "Brown"},
         ]
-        
         for customer in customers:
             if not db.query(User).filter(User.email == customer["email"]).first():
                 user = User(
@@ -54,12 +78,14 @@ def create_mock_data():
                 )
                 user.is_active = True
                 user.is_verified = True
+                user.is_email_verified = True
                 db.add(user)
-        
+                created_users += 1
+
         db.commit()
-        print(f"[OK] Created {len(customers)} customer users")
+        print(f"[OK] Created {created_users} users (admin, moderator, and customers)")
         
-        print("\n[2/5] Creating Products...")
+        print("\n[2/6] Creating Products...")
         # Products data
         products_data = [
             {"name": "iPhone 15 Pro Max", "description": "Latest iPhone with titanium design", "price": 1199.99, "sale_price": 1099.99, "category": "ELECTRONICS", "sku": "IPH-15PM", "brand": "Apple", "stock_quantity": 50, "is_featured": True, "is_bestseller": True},
@@ -172,6 +198,12 @@ def create_mock_data():
                     order.status = random.choice([OrderStatus.CANCELLED, OrderStatus.REFUNDED])
                 
                 order.shipping_method = random.choice(list(ShippingMethod))
+                order.discount_amount = 0.0
+                order.handling_fee = 0.0
+                order.total_amount = 0.0
+                order.subtotal = 0.0
+                order.tax_amount = 0.0
+                order.shipping_amount = 0.0
                 
                 # Add random number of items to calculate realistic totals
                 num_items = random.randint(1, 4)
@@ -183,13 +215,17 @@ def create_mock_data():
                     subtotal += (product.price * quantity)
                 
                 # Add shipping and tax
-                shipping_cost = 5.0 if subtotal < 50 else 0.0
-                tax_rate = 0.10
-                tax_amount = subtotal * tax_rate
-                order.total_amount = subtotal + shipping_cost + tax_amount
+                shipping_amount = 5.0 if subtotal < 50 else 0.0
+                order.shipping_amount = shipping_amount
+                order.tax_amount = subtotal * 0.10
                 order.subtotal = subtotal
-                order.shipping_cost = shipping_cost
-                order.tax_amount = tax_amount
+                
+                if order.status in [OrderStatus.DELIVERED, OrderStatus.CONFIRMED, OrderStatus.SHIPPED]:
+                    order.payment_status = PaymentStatus.COMPLETED
+                elif order.status == OrderStatus.CANCELLED:
+                    order.payment_status = PaymentStatus.CANCELLED
+                else:
+                    order.payment_status = random.choice([PaymentStatus.PROCESSING, PaymentStatus.PENDING])
                 
                 db.add(order)
                 db.flush()
@@ -203,15 +239,19 @@ def create_mock_data():
                         quantity=quantity,
                         unit_price=product.price
                     )
-                    # Set total price after initialization
-                    order_item.total_price = product.price * quantity
+                    # Set additional snapshot fields
+                    order_item.product_name = product.name
+                    order_item.product_sku = product.sku
+                    order_item.product_image = (product.thumbnail or (product.images[0] if product.images else None))
+                    order_item.selected_options = {"color": product.color or "Standard", "size": product.size or "M"}
                     db.add(order_item)
                 
+                order.calculate_totals()
                 db.commit()
             
             print(f"[OK] Created 25 orders")
         
-        print("\n[4/5] Creating Reviews...")
+        print("\n[4/6] Creating Reviews...")
         # Create reviews
         if users and products:
             review_texts = [
@@ -224,7 +264,7 @@ def create_mock_data():
                 ("Perfect fit", "Exactly what I was looking for. Great quality."),
             ]
             
-            for i in range(20):
+            for i in range(30):
                 user = random.choice(users)
                 product = random.choice(products)
                 comment_text, title = random.choice(review_texts)
@@ -236,15 +276,28 @@ def create_mock_data():
                     title=title,
                     comment=comment_text
                 )
-                # Set additional properties after initialization
                 review.is_verified_purchase = random.choice([True, False])
                 review.is_approved = random.choice([True, False])
                 db.add(review)
             
             db.commit()
-            print("[OK] Created 20 reviews")
+            print("[OK] Created 30 reviews")
         
-        print("\n[5/5] Creating Coupons...")
+        print("\n[5/6] Creating Wishlists and Cart Items...")
+        if users and products:
+            for user in random.sample(users, min(4, len(users))):
+                wishlist_items = random.sample(products, min(3, len(products)))
+                cart_items = random.sample(products, min(3, len(products)))
+                for product in wishlist_items:
+                    if not db.query(WishlistItem).filter(WishlistItem.user_id == user.id, WishlistItem.product_id == product.id).first():
+                        db.add(WishlistItem(user_id=user.id, product_id=product.id))
+                for product in cart_items:
+                    if not db.query(CartItem).filter(CartItem.user_id == user.id, CartItem.product_id == product.id).first():
+                        db.add(CartItem(user_id=user.id, product_id=product.id, quantity=random.randint(1, 3), selected_options={"color": product.color or "Standard", "size": product.size or "M"}))
+            db.commit()
+            print("[OK] Created wishlist and cart items")
+        
+        print("\n[6/6] Creating Coupons...")
         # Create coupons
         coupons_data = [
             {"code": "SAVE10", "name": "Save 10%", "discount_type": "percentage", "discount_value": 10, "valid_from": datetime.utcnow(), "valid_until": datetime.utcnow() + timedelta(days=30), "minimum_order_amount": 50},
@@ -254,6 +307,9 @@ def create_mock_data():
         ]
         
         for c_data in coupons_data:
+            existing_coupon = db.query(Coupon).filter(Coupon.code == c_data["code"]).first()
+            if existing_coupon:
+                continue
             coupon = Coupon(**c_data)
             db.add(coupon)
         

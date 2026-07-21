@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { adminProductsAPI, productsAPI } from '../../api';
+import { adminProductsAPI, productsAPI, extractErrorMessage } from '../../api';
 import { FiX } from 'react-icons/fi';
 
 const ProductModal = ({ isOpen, onClose, productId, onSuccess }) => {
@@ -10,7 +10,7 @@ const ProductModal = ({ isOpen, onClose, productId, onSuccess }) => {
     price: '',
     sale_price: '',
     stock_quantity: '',
-    category: 'ELECTRONICS',
+    category: 'electronics',
     brand: '',
     sku: '',
   });
@@ -27,7 +27,7 @@ const ProductModal = ({ isOpen, onClose, productId, onSuccess }) => {
         price: '',
         sale_price: '',
         stock_quantity: '',
-        category: 'ELECTRONICS',
+        category: 'electronics',
         brand: '',
         sku: '',
       });
@@ -44,7 +44,7 @@ const ProductModal = ({ isOpen, onClose, productId, onSuccess }) => {
         price: product.price || '',
         sale_price: product.sale_price || '',
         stock_quantity: product.stock_quantity || '',
-        category: product.category || 'ELECTRONICS',
+        category: product.category || 'electronics',
         brand: product.brand || '',
         sku: product.sku || '',
       });
@@ -84,7 +84,7 @@ const ProductModal = ({ isOpen, onClose, productId, onSuccess }) => {
       onClose();
     } catch (error) {
       console.error('Error saving product:', error);
-      alert('Failed to save product. ' + (error.response?.data?.detail || ''));
+      alert('Failed to save product. ' + extractErrorMessage(error));
     } finally {
       setLoading(false);
     }
@@ -187,11 +187,21 @@ const ProductModal = ({ isOpen, onClose, productId, onSuccess }) => {
                 required
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               >
-                <option value="ELECTRONICS">Electronics</option>
-                <option value="CLOTHING">Clothing</option>
-                <option value="BOOKS">Books</option>
-                <option value="HOME_GARDEN">Home & Garden</option>
-                <option value="SPORTS">Sports</option>
+                <option value="electronics">Electronics</option>
+                <option value="clothing">Clothing</option>
+                <option value="books">Books</option>
+                <option value="home_garden">Home &amp; Garden</option>
+                <option value="sports">Sports</option>
+                <option value="beauty">Beauty</option>
+                <option value="toys">Toys</option>
+                <option value="automotive">Automotive</option>
+                <option value="health">Health</option>
+                <option value="food">Food</option>
+                <option value="jewelry">Jewelry</option>
+                <option value="furniture">Furniture</option>
+                <option value="music">Music</option>
+                <option value="movies">Movies</option>
+                <option value="gardening">Gardening</option>
               </select>
             </div>
           </div>

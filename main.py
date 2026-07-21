@@ -34,7 +34,8 @@ from services.auth_service import *
 async def lifespan(app: FastAPI):
     # Startup
     init_db()
-    await create_sample_data()
+    from populate_mock_data import create_mock_data
+    create_mock_data()
     yield
     # Shutdown
     pass
@@ -188,7 +189,7 @@ async def api_info():
         "description": "Industry-best-practice internal testing product",
         "endpoints": {
             "authentication": [
-                "POST /auth/register - User registration",
+                "POST /auth/register - Create user (admin only)",
                 "POST /auth/login - User login",
                 "POST /auth/refresh - Refresh token",
                 "POST /auth/logout - User logout"
@@ -278,271 +279,23 @@ async def api_info():
 # Sample data creation
 async def create_sample_data():
     """Create comprehensive sample data for testing"""
-    from database import SessionLocal
-    from passlib.context import CryptContext
-    
-    pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-    
-    db = SessionLocal()
-    try:
-        # Check if data already exists
-        user_count = db.query(User).count()
-        if user_count > 0:
-            print("Sample data already exists, skipping creation")
-            return
-        
-        print("Creating comprehensive sample data...")
-        
-        # Create admin user
-        admin_user = User(
-            email="admin@ecommerce.com",
-            username="admin",
-            password="admin123",
-            first_name="Admin",
-            last_name="User",
-            role=UserRole.ADMIN
-        )
-        admin_user.is_active = True
-        admin_user.is_verified = True
-        admin_user.is_email_verified = True
-        db.add(admin_user)
-        
-        # Create test customer
-        customer = User(
-            email="customer@test.com",
-            username="customer",
-            password="customer123",
-            first_name="John",
-            last_name="Doe",
-            role=UserRole.CUSTOMER
-        )
-        customer.is_active = True
-        customer.is_verified = True
-        customer.is_email_verified = True
-        db.add(customer)
-        
-        # Create moderator
-        moderator = User(
-            email="moderator@ecommerce.com",
-            username="moderator",
-            password="moderator123",
-            first_name="Moderator",
-            last_name="User",
-            role=UserRole.MODERATOR
-        )
-        moderator.is_active = True
-        moderator.is_verified = True
-        moderator.is_email_verified = True
-        db.add(moderator)
-        
-        db.commit()
-        
-        # Create sample products
-        products = [
-            Product(
-                name="iPhone 15 Pro Max",
-                description="Latest iPhone with advanced features and titanium design",
-                price=1199.99,
-                sale_price=1099.99,
-                cost_price=800.00,
-                category=ProductCategory.ELECTRONICS,
-                sku="IPHONE-15-PRO-MAX",
-                barcode="1234567890123",
-                brand="Apple",
-                manufacturer="Apple Inc.",
-                stock_quantity=50,
-                min_stock_level=10,
-                is_featured=True,
-                is_bestseller=True,
-                weight=0.221,
-                dimensions={"length": 15.9, "width": 7.7, "height": 0.8},
-                color="Natural Titanium",
-                material="Titanium",
-                images=[
-                    "https://example.com/iphone15pro1.jpg",
-                    "https://example.com/iphone15pro2.jpg",
-                    "https://example.com/iphone15pro3.jpg"
-                ],
-                thumbnail="https://example.com/iphone15pro_thumb.jpg",
-                tags=["smartphone", "apple", "5g", "camera", "premium"],
-                keywords=["iphone", "smartphone", "apple", "mobile"],
-                warranty_period=365,
-                return_period=30
-            ),
-            Product(
-                name="Nike Air Max 270",
-                description="Comfortable running shoes with Air Max technology for maximum cushioning",
-                price=129.99,
-                sale_price=99.99,
-                cost_price=60.00,
-                category=ProductCategory.SPORTS,
-                sku="NIKE-AIR-MAX-270",
-                barcode="9876543210987",
-                brand="Nike",
-                manufacturer="Nike Inc.",
-                stock_quantity=100,
-                min_stock_level=20,
-                is_featured=True,
-                weight=0.8,
-                dimensions={"length": 30, "width": 12, "height": 8},
-                color="Black/White",
-                size="10",
-                material="Mesh and synthetic",
-                images=["https://example.com/nike2701.jpg", "https://example.com/nike2702.jpg"],
-                thumbnail="https://example.com/nike270_thumb.jpg",
-                tags=["running", "shoes", "comfortable", "athletic"],
-                keywords=["nike", "running", "shoes", "athletic"],
-                warranty_period=90,
-                return_period=30
-            ),
-            Product(
-                name="The Great Gatsby",
-                description="Classic American novel by F. Scott Fitzgerald about the Jazz Age",
-                price=12.99,
-                cost_price=5.00,
-                category=ProductCategory.BOOKS,
-                sku="BOOK-GATSBY",
-                barcode="4567891234567",
-                brand="Scribner",
-                manufacturer="Simon & Schuster",
-                stock_quantity=200,
-                min_stock_level=50,
-                is_bestseller=True,
-                weight=0.3,
-                dimensions={"length": 20, "width": 13, "height": 2},
-                color="Black",
-                material="Paper",
-                images=["https://example.com/gatsby1.jpg"],
-                thumbnail="https://example.com/gatsby_thumb.jpg",
-                tags=["classic", "fiction", "literature", "american"],
-                keywords=["gatsby", "classic", "fiction", "literature"],
-                warranty_period=None,
-                return_period=30
-            ),
-            Product(
-                name="Samsung 4K Smart TV",
-                description="55-inch 4K Ultra HD Smart TV with HDR and built-in streaming apps",
-                price=699.99,
-                cost_price=450.00,
-                category=ProductCategory.ELECTRONICS,
-                sku="SAMSUNG-TV-55-4K",
-                barcode="7891234567890",
-                brand="Samsung",
-                manufacturer="Samsung Electronics",
-                stock_quantity=25,
-                min_stock_level=5,
-                is_featured=True,
-                weight=15.5,
-                dimensions={"length": 123, "width": 70, "height": 5},
-                color="Black",
-                material="Plastic and metal",
-                images=["https://example.com/samsungtv1.jpg", "https://example.com/samsungtv2.jpg"],
-                thumbnail="https://example.com/samsungtv_thumb.jpg",
-                tags=["tv", "4k", "smart", "hdr", "entertainment"],
-                keywords=["samsung", "tv", "4k", "smart", "television"],
-                warranty_period=730,
-                return_period=30
-            ),
-            Product(
-                name="Levi's 501 Original Jeans",
-                description="Classic straight fit jeans with button fly and timeless style",
-                price=59.99,
-                sale_price=49.99,
-                cost_price=25.00,
-                category=ProductCategory.CLOTHING,
-                sku="LEVIS-501-ORIGINAL",
-                barcode="3216549873210",
-                brand="Levi's",
-                manufacturer="Levi Strauss & Co.",
-                stock_quantity=150,
-                min_stock_level=30,
-                is_bestseller=True,
-                weight=0.5,
-                dimensions={"length": 80, "width": 30, "height": 2},
-                color="Blue",
-                size="32x32",
-                material="Denim",
-                images=["https://example.com/levis5011.jpg", "https://example.com/levis5012.jpg"],
-                thumbnail="https://example.com/levis501_thumb.jpg",
-                tags=["jeans", "denim", "classic", "casual"],
-                keywords=["levis", "jeans", "denim", "casual"],
-                warranty_period=None,
-                return_period=30
-            )
-        ]
-        
-        for product in products:
-            db.add(product)
-        
-        db.commit()
-        
-        # Create sample coupons
-        coupons = [
-            Coupon(
-                code="WELCOME10",
-                name="Welcome Discount",
-                description="10% off your first order",
-                discount_type="percentage",
-                discount_value=10.0,
-                minimum_order_amount=50.0,
-                max_uses=100,
-                max_uses_per_user=1,
-                valid_from=datetime.utcnow(),
-                valid_until=datetime.utcnow() + timedelta(days=365),
-                is_active=True
-            ),
-            Coupon(
-                code="FREESHIP",
-                name="Free Shipping",
-                description="Free shipping on orders over $100",
-                discount_type="free_shipping",
-                discount_value=5.0,
-                minimum_order_amount=100.0,
-                max_uses=50,
-                max_uses_per_user=1,
-                valid_from=datetime.utcnow(),
-                valid_until=datetime.utcnow() + timedelta(days=30),
-                is_active=True
-            ),
-            Coupon(
-                code="SAVE20",
-                name="20% Off Electronics",
-                description="20% off all electronics",
-                discount_type="percentage",
-                discount_value=20.0,
-                minimum_order_amount=100.0,
-                maximum_discount=200.0,
-                applicable_categories=["electronics"],
-                max_uses=25,
-                max_uses_per_user=2,
-                valid_from=datetime.utcnow(),
-                valid_until=datetime.utcnow() + timedelta(days=60),
-                is_active=True
-            )
-        ]
-        
-        for coupon in coupons:
-            db.add(coupon)
-        
-        db.commit()
-        print("Sample data created successfully!")
-        
-    except Exception as e:
-        print(f"Error creating sample data: {e}")
-        db.rollback()
-    finally:
-        db.close()
+    from populate_mock_data import create_mock_data
+    create_mock_data()
+
 
 # ============================================================================
 # AUTHENTICATION ENDPOINTS
 # ============================================================================
 
 @app.post("/auth/register", response_model=UserResponse, status_code=201)
-async def register(user_data: UserCreate, db: Session = Depends(get_db)):
-    """Register a new user"""
+async def register(
+    user_data: UserCreate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_admin_user),
+):
+    """Create a user — admin only (public self-registration is disabled)."""
     try:
         db_user = register_user(db, user_data)
-        # Convert User model to UserResponse
         return UserResponse(
             id=db_user.id,
             email=db_user.email,
@@ -811,12 +564,18 @@ async def create_product(
     # Check if SKU already exists
     if db.query(Product).filter(Product.sku == product_data.sku).first():
         raise HTTPException(status_code=400, detail="SKU already exists")
-    
-    db_product = Product(**product_data.dict())
-    db.add(db_product)
-    db.commit()
-    db.refresh(db_product)
-    return db_product
+
+    try:
+        payload = product_data.dict() if hasattr(product_data, "dict") else product_data.model_dump()
+        db_product = Product(**payload)
+        db.add(db_product)
+        db.commit()
+        db.refresh(db_product)
+        return db_product
+    except Exception as e:
+        db.rollback()
+        # Surface IntegrityError / unexpected failures clearly (not opaque 500)
+        raise HTTPException(status_code=500, detail=f"Failed to create product: {e}") from e
 
 @app.put("/products/{product_id}", response_model=ProductResponse)
 async def update_product(
@@ -1424,12 +1183,12 @@ async def create_coupon(
 @app.get("/coupons", response_model=List[CouponResponse])
 async def list_coupons(
     skip: int = Query(0, ge=0),
-    limit: int = Query(20, ge=1, le=100),
+    limit: int = Query(100, ge=1, le=200),
     current_user: User = Depends(get_current_admin_user),
     db: Session = Depends(get_db)
 ):
     """List all coupons (admin only)"""
-    coupons = db.query(Coupon).offset(skip).limit(limit).all()
+    coupons = db.query(Coupon).order_by(Coupon.id.desc()).offset(skip).limit(limit).all()
     return coupons
 
 @app.get("/coupons/{code}")
@@ -2793,10 +2552,17 @@ async def admin_stats(
     }
 
 if __name__ == "__main__":
+    import os
     import uvicorn
+
+    # Always bind demo API to 9000 on shared EC2 (main TestNeo uses 8000).
+    # Override only with ECOM_PORT / ECOM_HOST — never inherit generic PORT.
+    bind_host = os.environ.get("ECOM_HOST", settings.host or "0.0.0.0")
+    bind_port = int(os.environ.get("ECOM_PORT", "9000"))
+    print(f"Starting ecommerce API on {bind_host}:{bind_port}")
     uvicorn.run(
-        app, 
-        host=settings.host, 
-        port=settings.port,
-        log_level="info"
+        app,
+        host=bind_host,
+        port=bind_port,
+        log_level="info",
     )

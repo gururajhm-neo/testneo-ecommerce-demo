@@ -1,10 +1,22 @@
 import axios from 'axios';
 
-// Use localhost for local development, remote server for production
-const API_URL = import.meta.env.VITE_API_URL || 
-  (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
-    ? 'http://localhost:9000' 
-    : 'http://44.202.138.57:9000');
+function resolveApiUrl() {
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL;
+  }
+  const { hostname, protocol, host } = window.location;
+  if (hostname === 'localhost' || hostname === '127.0.0.1') {
+    return 'http://localhost:9000';
+  }
+  // Direct EC2 IP access: UI on :3001, API on :9000
+  if (/^\d{1,3}(\.\d{1,3}){3}$/.test(hostname)) {
+    return `http://${hostname}:9000`;
+  }
+  // Domain access (e.g. testneo-ecom.testneo.ai): same origin /api → nginx → backend
+  return `${protocol}//${host}/api`;
+}
+
+const API_URL = resolveApiUrl();
 
 const api = axios.create({
   baseURL: API_URL,
@@ -97,6 +109,13 @@ export const adminProductsAPI = {
   createProduct: (data) => api.post('/products', data),
   updateProduct: (id, data) => api.put(`/products/${id}`, data),
   deleteProduct: (id) => api.delete(`/products/${id}`),
+};
+
+// Admin - Coupons
+export const adminCouponsAPI = {
+  list: (params = {}) => api.get('/coupons', { params }),
+  create: (data) => api.post('/coupons', data),
+  update: (id, data) => api.put(`/coupons/${id}`, data),
 };
 
 // Admin - Orders

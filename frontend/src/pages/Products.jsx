@@ -1,14 +1,16 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FiShoppingCart, FiSearch } from 'react-icons/fi';
-import { productsAPI, cartAPI } from '../api';
+import { productsAPI } from '../api';
 import { useAuth } from '../context/AuthContext';
+import { useCart } from '../context/CartContext';
 
 const Products = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const { isAuthenticated } = useAuth();
+  const { addToCart: addToCartContext } = useCart();
 
   useEffect(() => {
     fetchProducts();
@@ -32,7 +34,7 @@ const Products = () => {
     }
 
     try {
-      await cartAPI.addToCart({ product_id: productId, quantity: 1 });
+      await addToCartContext(productId, 1);
       alert('Product added to cart!');
     } catch (error) {
       alert('Failed to add product to cart');

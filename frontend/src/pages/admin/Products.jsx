@@ -145,7 +145,14 @@ const Products = () => {
 
       {/* Page header */}
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-gray-900">Products</h1>
+        <div className="flex items-center gap-3">
+          <h1 className="text-3xl font-bold text-gray-900">Products</h1>
+          {!loading && (
+            <span className="px-2.5 py-0.5 rounded-full text-sm font-semibold bg-primary-100 text-primary-700">
+              {allProducts.length}
+            </span>
+          )}
+        </div>
         <div className="flex items-center space-x-3">
           <button
             onClick={handleExport}

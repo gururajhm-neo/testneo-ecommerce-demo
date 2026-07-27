@@ -38,7 +38,7 @@ const Login = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-primary-500 to-primary-700 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full bg-white rounded-lg shadow-xl p-8">
-        <h2 className="text-3xl font-bold text-center text-gray-900 mb-8">Login</h2>
+        <h2 className="text-3xl font-bold text-center text-gray-900 mb-8">Welcome back to Test-Neo-Ecommerce Login</h2>
         
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">

@@ -125,4 +125,15 @@ This project is intended for:
 - UI and API testing
 - Team walkthroughs
 - CI/CD and automation examples
+- **Agent Verification E2E** — CrewAI / deterministic agents → TestNeo gate ([DEMO_WALKTHROUGH.md](./DEMO_WALKTHROUGH.md), [agents/README.md](./agents/README.md))
+
+### Agent + TestNeo (quick)
+
+```bash
+./start_all.sh
+cp agents/.env.example agents/.env   # set TESTNEO_API_KEY + TESTNEO_PROJECT_ID
+./agents/scripts/demo_e2e.sh
+```
+
+Default agent runtime is **deterministic** (reliable demos). Set `AGENT_RUNTIME=crewai` for optional LLM narration.
 

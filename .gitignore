@@ -42,6 +42,10 @@ Thumbs.db
 # Environment variables
 .env
 .env.local
+agents/.env
+
+# Agent demo artifacts
+agents/artifacts/
 
 # Logs
 *.log

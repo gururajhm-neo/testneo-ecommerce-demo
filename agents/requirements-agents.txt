@@ -1,0 +1,3 @@
+# Optional — only needed for AGENT_RUNTIME=crewai
+crewai>=0.80.0
+litellm>=1.40.0

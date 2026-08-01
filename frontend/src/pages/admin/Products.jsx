@@ -211,6 +211,30 @@ const Products = () => {
         itemName={deleteModal.product?.name}
       />
 
+      {/* Summary cards */}
+      {!loading && (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="bg-white rounded-lg shadow p-4">
+            <p className="text-xs text-gray-500 uppercase tracking-wide">Total Products</p>
+            <p className="text-2xl font-bold text-gray-900 mt-1">{allProducts.length}</p>
+          </div>
+          <div className="bg-white rounded-lg shadow p-4">
+            <p className="text-xs text-gray-500 uppercase tracking-wide">Active</p>
+            <p className="text-2xl font-bold text-green-600 mt-1">{allProducts.filter(p => p.is_active).length}</p>
+          </div>
+          <div className="bg-white rounded-lg shadow p-4">
+            <p className="text-xs text-gray-500 uppercase tracking-wide">Out of Stock</p>
+            <p className="text-2xl font-bold text-red-500 mt-1">{allProducts.filter(p => p.stock_quantity === 0).length}</p>
+          </div>
+          <div className="bg-white rounded-lg shadow p-4">
+            <p className="text-xs text-gray-500 uppercase tracking-wide">Inventory Value</p>
+            <p className="text-2xl font-bold text-primary-600 mt-1">
+              ${allProducts.reduce((sum, p) => sum + ((p.price || 0) * (p.stock_quantity || 0)), 0).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Search + filters */}
       <div className="bg-white rounded-lg shadow p-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

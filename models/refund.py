@@ -61,13 +61,22 @@ class Refund(Base):
         Index('idx_refund_created', 'created_at'),
     )
     
-    def __init__(self, order_id: int, user_id: int, amount: float, reason: str, description: str = None):
+    def __init__(
+        self,
+        order_id: int,
+        user_id: int,
+        amount: float,
+        reason: str,
+        description: str = None,
+        customer_contact: str = None,
+    ):
         """Initialize refund"""
         self.order_id = order_id
         self.user_id = user_id
         self.amount = amount
         self.reason = reason
         self.description = description
+        self.customer_contact = customer_contact
     
     def approve(self, processed_by: int, refund_method: str = "original_payment"):
         """Approve the refund"""

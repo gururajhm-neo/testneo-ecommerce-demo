@@ -22,6 +22,15 @@ GOAL = "Look up the shopper's last order reference from memory and confirm it."
 class MemoryResult:
     summary: dict[str, Any]
     artifact_path: Path
+    action_log: ActionLog | None = None
+    goal: str = GOAL
+    gate_contract: dict[str, Any] | None = None
+    confirmation_obtained: bool = False
+    outcome: str = "success"
+    autonomy_decision: str = "proceed"
+    agent_claim: str = ""
+    authorization: str = "READ_ONLY"
+    identity: dict[str, Any] | None = None
 
 
 def run_memory_isolation(
@@ -126,4 +135,16 @@ def run_memory_isolation(
     (ARTIFACTS_DIR / "memory_latest.json").write_text(
         json.dumps(summary, indent=2), encoding="utf-8"
     )
-    return MemoryResult(summary=summary, artifact_path=path)
+    return MemoryResult(
+        summary=summary,
+        artifact_path=path,
+        action_log=log,
+        goal=GOAL,
+        gate_contract=gate_contract,
+        confirmation_obtained=confirm,
+        outcome=outcome,
+        autonomy_decision="clarify" if not break_mode else "proceed",
+        agent_claim=claim,
+        authorization="READ_ONLY",
+        identity={"user_id": session_user, "user_email": settings.ecom_email},
+    )

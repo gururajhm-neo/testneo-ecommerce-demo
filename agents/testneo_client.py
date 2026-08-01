@@ -99,6 +99,10 @@ class TestNeoClient:
         }
         if context_id is not None:
             body["context_id"] = context_id
+        # Prove-after-write against ecom API (not the React app on :3001)
+        probe = (getattr(s, "ecom_api_base", None) or "").rstrip("/")
+        if probe:
+            body["probe_base_url"] = probe
         return self._request(
             "POST",
             f"/api/web/v1/projects/{self.project_id}/agent-verification/post-agent-gate",

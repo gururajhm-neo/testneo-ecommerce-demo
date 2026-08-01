@@ -24,6 +24,12 @@ class RefundResult:
     refund: dict[str, Any] | None
     order_id: int | None
     artifact_path: Path
+    action_log: ActionLog | None = None
+    goal: str = GOAL
+    gate_contract: dict[str, Any] | None = None
+    confirmation_obtained: bool = False
+    outcome: str = "success"
+    autonomy_decision: str = "proceed"
 
 
 def run_refund(
@@ -116,6 +122,7 @@ def run_refund(
                     "require_retrieval": True,
                     "ground_claim_phrases": ["30 days", "full refund"],
                 },
+                "probe_base_url": settings.ecom_api_base,
             }
         else:
             confirm = True
@@ -146,6 +153,7 @@ def run_refund(
                     "require_retrieval": True,
                     "ground_claim_phrases": ["30 days", "full refund"],
                 },
+                "probe_base_url": settings.ecom_api_base,
             }
 
     summary = build_summary(
@@ -177,6 +185,12 @@ def run_refund(
         refund=refund,
         order_id=resolved_order_id,
         artifact_path=path,
+        action_log=log,
+        goal=GOAL,
+        gate_contract=gate_contract,
+        confirmation_obtained=confirm,
+        outcome=outcome,
+        autonomy_decision=autonomy,
     )
 
 

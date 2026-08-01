@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 from pathlib import Path
 from typing import Any
@@ -80,12 +81,17 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Ecom CrewAI/deterministic → TestNeo E2E demo")
     parser.add_argument(
         "--scenario",
-        choices=("all", "checkout", "refund", "refund-break", "memory", "checkout-break"),
+        choices=("all", "checkout", "refund", "refund-break", "memory", "memory-ok", "checkout-break"),
         default="all",
     )
     parser.add_argument("--skip-gate", action="store_true", help="Emit summaries only")
     parser.add_argument("--skip-suite", action="store_true", help="Gate without product suite")
     parser.add_argument("--seed", action="store_true", help="Seed delivered order first")
+    parser.add_argument(
+        "--print-emit",
+        action="store_true",
+        help="Pretty-print full agent_run_summary.v1 JSON (SDK emit) to stdout",
+    )
     args = parser.parse_args(argv)
 
     settings = load_settings()
@@ -121,6 +127,8 @@ def main(argv: list[str] | None = None) -> int:
         scenarios.append(("refund-break", lambda: run_refund(settings, break_mode=True)))
     if args.scenario in ("all", "memory"):
         scenarios.append(("memory-break", lambda: run_memory_isolation(settings, break_mode=True)))
+    if args.scenario == "memory-ok":
+        scenarios.append(("memory-ok", lambda: run_memory_isolation(settings, break_mode=False)))
 
     # For "all", preferred demo order: checkout ok → refund break → memory
     if args.scenario == "all":
@@ -141,6 +149,19 @@ def main(argv: list[str] | None = None) -> int:
         summary = result.summary
         print(f"claim: {summary.get('agent_claim')}")
         print(f"outcome: {summary.get('outcome')}  artifact: {result.artifact_path}")
+        print(
+            f"emit: contract={summary.get('contract_version')} "
+            f"source={summary.get('source')} "
+            f"via_sdk={os.environ.get('TESTNEO_USE_SDK', '1')}"
+        )
+        print(
+            f"  tools={summary.get('touched', {}).get('tools')} "
+            f"retrieved={[r.get('doc_id') for r in (summary.get('retrieved') or [])]} "
+            f"memory={len(summary.get('memory_accesses') or [])}"
+        )
+        if args.print_emit:
+            _banner(f"SDK emit — {label} — {summary.get('agent_run_id')}")
+            print(json.dumps(summary, indent=2, default=str))
         if client:
             gate = ingest_and_gate(client, summary, label=label, run_suite=run_suite and label.startswith("checkout"))
             results.append((label, summary, gate))

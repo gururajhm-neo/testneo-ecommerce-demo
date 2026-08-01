@@ -47,7 +47,17 @@ def search_policy(query: str, *, prefer_expired: bool = False) -> dict[str, Any]
         doc = DOCS["policy_refund_v2"]
         score = 0.88
     body = doc.read()
-    snippet = body.strip().split("\n\n")[0][:400]
+    # Prefer a substantive chunk (not just the markdown title) so claim grounding
+    # can match phrases like "30 days" / "full refund" from real policy text.
+    paragraphs = [p.strip() for p in body.strip().split("\n\n") if p.strip()]
+    snippet = ""
+    for p in paragraphs:
+        if p.startswith("#"):
+            continue
+        snippet = p[:500]
+        break
+    if not snippet and paragraphs:
+        snippet = paragraphs[0][:500]
     return {
         "doc_id": doc.doc_id,
         "chunk_id": "c1",
